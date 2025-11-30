@@ -221,11 +221,18 @@ Current test coverage: 32% (10 tests passing)
 
 ## Documentation
 
-- [PRE-PRD](docs/pre-prd.reachy-app-suite.md) - Vision and high-level goals
-- [Assistant Instructions](docs/assistant-instructions.md) - Development guidelines
-- [SDK Integration Plan](docs/sprint-artifacts/sdk-integration-plan.md) - Detailed technical analysis
+### Getting Started
+- **[Getting Started Guide](docs/getting-started.md)** - Installation and first steps
+- **[API Reference](docs/api-reference.md)** - Complete API documentation
 - [Daemon Setup Guide](docs/daemon-setup.md) - Setup and troubleshooting
+
+### Planning & Architecture
+- [PRE-PRD](docs/pre-prd.reachy-app-suite.md) - Vision and high-level goals
+- [SDK Integration Plan](docs/sprint-artifacts/sdk-integration-plan.md) - Detailed technical analysis
 - [Workflow Summary](docs/sprint-artifacts/workflow-init-summary.md) - Sprint 0 progress
+
+### Development
+- [Assistant Instructions](docs/assistant-instructions.md) - Development guidelines
 
 ## Contributing
 
