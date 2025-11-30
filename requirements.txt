@@ -1,0 +1,33 @@
+# Core dependencies for Reachy Mini App Suite
+# This file is for pip-based installations
+# For development setup, see pyproject.toml
+
+# Core Python packages
+# Note: numpy>=2.2.5 required by reachy-mini SDK
+numpy>=2.2.0
+scipy>=1.15.3,<2.0
+
+# Web framework for UI apps
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+jinja2>=3.1.0
+
+# HTTP client
+aiohttp>=3.9.0
+
+# Audio handling
+sounddevice>=0.4.6
+soundfile>=0.12.1
+
+# Configuration and utilities
+python-dotenv>=1.0.0
+
+# Reachy Mini SDK (Pollen Robotics)
+# Official SDK for controlling Reachy Mini robot
+reachy-mini>=1.1.2
+
+# Optional: Hugging Face integration
+# Uncomment if you want HF support
+# huggingface-hub>=0.19.0
+# transformers>=4.35.0
+# Install with: pip install reachy_mini

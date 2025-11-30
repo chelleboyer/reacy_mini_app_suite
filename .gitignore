@@ -1,0 +1,64 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+config.json
+*.local.json
+
+# Do NOT ignore src-reference (we want to keep those directories)
+# But ignore build artifacts within them
+src-reference/**/build/
+src-reference/**/dist/
+src-reference/**/*.egg-info/
+src-reference/**/__pycache__/
+
+# Ignore nested git repositories in src-reference
+src-reference/**/.git/
+src-reference/**/.gitignore
