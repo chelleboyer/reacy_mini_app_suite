@@ -1,15 +1,20 @@
-"""Safe motion controller with limits and validation.
+"""Safe motion controller with limits, validation, and gesture library.
 
 This module provides safety features for robot motions, including
-joint limit checking, velocity limits, and smooth interpolation.
+joint limit checking, velocity limits, smooth interpolation, and
+pre-defined gestures and expressions for common interactions.
 """
 
 import logging
-from typing import List, Optional, Tuple
+import time
+from typing import List, Optional, Tuple, TYPE_CHECKING
 
 import numpy as np
 
 from ..core import setup_logger
+
+if TYPE_CHECKING:
+    from .robot_wrapper import ReachyWrapper
 
 
 class SafeMotionController:
@@ -207,3 +212,337 @@ class SafeMotionController:
         safe_duration = max(required_duration, min_duration)
         
         return safe_duration
+    
+    # ============================================================
+    # GESTURE LIBRARY
+    # ============================================================
+    
+    def nod_yes(self, robot: "ReachyWrapper", count: int = 2, speed: float = 1.0) -> None:
+        """Perform a 'yes' nodding gesture.
+        
+        Args:
+            robot: ReachyWrapper instance to control
+            count: Number of nods
+            speed: Speed multiplier (higher = faster)
+        """
+        base_duration = 0.4 / speed
+        pitch_down = 15  # degrees
+        pitch_up = -10
+        
+        self.logger.info(f"Performing 'yes' nod gesture ({count} times)")
+        
+        for i in range(count):
+            # Nod down
+            robot.move_head(pitch=pitch_down, duration=base_duration, degrees=True)
+            time.sleep(base_duration)
+            
+            # Nod up
+            robot.move_head(pitch=pitch_up, duration=base_duration, degrees=True)
+            time.sleep(base_duration)
+        
+        # Return to neutral
+        robot.move_head(pitch=0, duration=base_duration, degrees=True)
+        time.sleep(base_duration)
+    
+    def shake_no(self, robot: "ReachyWrapper", count: int = 2, speed: float = 1.0) -> None:
+        """Perform a 'no' head shaking gesture.
+        
+        Args:
+            robot: ReachyWrapper instance to control
+            count: Number of shakes
+            speed: Speed multiplier (higher = faster)
+        """
+        base_duration = 0.3 / speed
+        yaw_left = -25  # degrees
+        yaw_right = 25
+        
+        self.logger.info(f"Performing 'no' shake gesture ({count} times)")
+        
+        for i in range(count):
+            # Shake left
+            robot.move_head(yaw=yaw_left, duration=base_duration, degrees=True)
+            time.sleep(base_duration)
+            
+            # Shake right
+            robot.move_head(yaw=yaw_right, duration=base_duration, degrees=True)
+            time.sleep(base_duration)
+        
+        # Return to neutral
+        robot.move_head(yaw=0, duration=base_duration, degrees=True)
+        time.sleep(base_duration)
+    
+    def tilt_curious(self, robot: "ReachyWrapper", direction: str = "right") -> None:
+        """Perform a curious head tilt.
+        
+        Args:
+            robot: ReachyWrapper instance to control
+            direction: 'left' or 'right'
+        """
+        tilt_angle = 15 if direction == "right" else -15
+        duration = 0.6
+        
+        self.logger.info(f"Performing curious tilt to {direction}")
+        
+        # Tilt head
+        robot.move_head(roll=tilt_angle, duration=duration, degrees=True)
+        time.sleep(duration)
+        
+        # Hold for a moment
+        time.sleep(0.5)
+        
+        # Return to neutral
+        robot.move_head(roll=0, duration=duration, degrees=True)
+        time.sleep(duration)
+    
+    def wave_antennas(
+        self, 
+        robot: "ReachyWrapper", 
+        count: int = 3, 
+        speed: float = 1.0,
+        synchronized: bool = True
+    ) -> None:
+        """Wave the antennas in a friendly gesture.
+        
+        Args:
+            robot: ReachyWrapper instance to control
+            count: Number of waves
+            speed: Speed multiplier (higher = faster)
+            synchronized: If True, antennas move together; if False, alternating
+        """
+        base_duration = 0.3 / speed
+        amplitude = 0.8  # radians
+        
+        self.logger.info(f"Waving antennas ({count} times, {'synchronized' if synchronized else 'alternating'})")
+        
+        for i in range(count):
+            if synchronized:
+                # Both antennas move together
+                robot.move_antennas(left=amplitude, right=-amplitude, duration=base_duration)
+                time.sleep(base_duration)
+                robot.move_antennas(left=-amplitude, right=amplitude, duration=base_duration)
+                time.sleep(base_duration)
+            else:
+                # Alternating wave
+                robot.move_antennas(left=amplitude, right=0, duration=base_duration)
+                time.sleep(base_duration)
+                robot.move_antennas(left=0, right=-amplitude, duration=base_duration)
+                time.sleep(base_duration)
+        
+        # Return to neutral
+        robot.move_antennas(left=0, right=0, duration=base_duration)
+        time.sleep(base_duration)
+    
+    def look_around(self, robot: "ReachyWrapper", speed: float = 1.0) -> None:
+        """Look around by scanning left and right.
+        
+        Args:
+            robot: ReachyWrapper instance to control
+            speed: Speed multiplier (higher = faster)
+        """
+        base_duration = 1.0 / speed
+        yaw_angle = 40  # degrees
+        
+        self.logger.info("Performing look around gesture")
+        
+        # Look left
+        robot.move_head(yaw=-yaw_angle, duration=base_duration, degrees=True)
+        time.sleep(base_duration + 0.5)
+        
+        # Look right
+        robot.move_head(yaw=yaw_angle, duration=base_duration * 1.5, degrees=True)
+        time.sleep(base_duration * 1.5 + 0.5)
+        
+        # Return to center
+        robot.move_head(yaw=0, duration=base_duration, degrees=True)
+        time.sleep(base_duration)
+    
+    def express_thinking(self, robot: "ReachyWrapper") -> None:
+        """Express a 'thinking' pose with head tilt and antenna positioning.
+        
+        Args:
+            robot: ReachyWrapper instance to control
+        """
+        self.logger.info("Expressing 'thinking' pose")
+        
+        # Tilt head slightly, look up
+        robot.move_head(roll=10, pitch=-8, duration=0.8, degrees=True)
+        time.sleep(0.8)
+        
+        # Position antennas in contemplative pose
+        robot.move_antennas(left=0.3, right=-0.3, duration=0.5)
+        time.sleep(0.5)
+        
+        # Hold pose
+        time.sleep(1.5)
+        
+        # Return to neutral
+        robot.move_head(roll=0, pitch=0, duration=0.8, degrees=True)
+        robot.move_antennas(left=0, right=0, duration=0.5)
+        time.sleep(0.8)
+    
+    # ============================================================
+    # EXPRESSION PRESETS
+    # ============================================================
+    
+    def express_happy(self, robot: "ReachyWrapper") -> None:
+        """Express happiness with upward head tilt and antenna wave.
+        
+        Args:
+            robot: ReachyWrapper instance to control
+        """
+        self.logger.info("Expressing 'happy' emotion")
+        
+        # Slight upward tilt
+        robot.move_head(pitch=-12, duration=0.6, degrees=True)
+        time.sleep(0.6)
+        
+        # Excited antenna wave
+        self.wave_antennas(robot, count=2, speed=1.5, synchronized=True)
+        
+        # Return to neutral with slight tilt
+        robot.move_head(pitch=-5, duration=0.5, degrees=True)
+        time.sleep(0.5)
+    
+    def express_sad(self, robot: "ReachyWrapper") -> None:
+        """Express sadness with downward head tilt and drooping antennas.
+        
+        Args:
+            robot: ReachyWrapper instance to control
+        """
+        self.logger.info("Expressing 'sad' emotion")
+        
+        # Look down
+        robot.move_head(pitch=15, duration=1.0, degrees=True)
+        time.sleep(1.0)
+        
+        # Droop antennas
+        robot.move_antennas(left=-0.3, right=0.3, duration=0.8)
+        time.sleep(0.8)
+        
+        # Hold pose
+        time.sleep(1.5)
+        
+        # Return to neutral slowly
+        robot.move_head(pitch=0, duration=1.2, degrees=True)
+        robot.move_antennas(left=0, right=0, duration=1.0)
+        time.sleep(1.2)
+    
+    def express_curious(self, robot: "ReachyWrapper") -> None:
+        """Express curiosity with head tilt and perked antennas.
+        
+        Args:
+            robot: ReachyWrapper instance to control
+        """
+        self.logger.info("Expressing 'curious' emotion")
+        
+        # Quick head tilt
+        robot.move_head(roll=15, pitch=-8, duration=0.5, degrees=True)
+        time.sleep(0.5)
+        
+        # Perk up antennas
+        robot.move_antennas(left=0.5, right=-0.5, duration=0.4)
+        time.sleep(0.4)
+        
+        # Hold curious pose
+        time.sleep(1.0)
+        
+        # Return to neutral
+        robot.move_head(roll=0, pitch=0, duration=0.6, degrees=True)
+        robot.move_antennas(left=0, right=0, duration=0.5)
+        time.sleep(0.6)
+    
+    def express_confused(self, robot: "ReachyWrapper") -> None:
+        """Express confusion with alternating head tilts.
+        
+        Args:
+            robot: ReachyWrapper instance to control
+        """
+        self.logger.info("Expressing 'confused' emotion")
+        
+        # Tilt left
+        robot.move_head(roll=-12, duration=0.4, degrees=True)
+        time.sleep(0.5)
+        
+        # Tilt right
+        robot.move_head(roll=12, duration=0.5, degrees=True)
+        time.sleep(0.6)
+        
+        # Back to left with antennas
+        robot.move_head(roll=-12, duration=0.4, degrees=True)
+        robot.move_antennas(left=-0.3, right=0.3, duration=0.4)
+        time.sleep(0.8)
+        
+        # Return to neutral
+        robot.move_head(roll=0, duration=0.5, degrees=True)
+        robot.move_antennas(left=0, right=0, duration=0.5)
+        time.sleep(0.5)
+    
+    def express_excited(self, robot: "ReachyWrapper") -> None:
+        """Express excitement with rapid movements and antenna waves.
+        
+        Args:
+            robot: ReachyWrapper instance to control
+        """
+        self.logger.info("Expressing 'excited' emotion")
+        
+        # Quick nod
+        self.nod_yes(robot, count=2, speed=2.0)
+        
+        # Rapid antenna wave
+        self.wave_antennas(robot, count=3, speed=2.0, synchronized=True)
+        
+        # Slight upward tilt
+        robot.move_head(pitch=-8, duration=0.4, degrees=True)
+        time.sleep(0.4)
+    
+    # ============================================================
+    # SMOOTH TRANSITIONS
+    # ============================================================
+    
+    def transition_to_pose(
+        self,
+        robot: "ReachyWrapper",
+        roll: float = 0,
+        pitch: float = 0,
+        yaw: float = 0,
+        left_antenna: float = 0,
+        right_antenna: float = 0,
+        duration: float = 1.0,
+        degrees: bool = True,
+    ) -> None:
+        """Smoothly transition to a specific pose.
+        
+        Args:
+            robot: ReachyWrapper instance to control
+            roll: Target roll angle
+            pitch: Target pitch angle
+            yaw: Target yaw angle
+            left_antenna: Target left antenna position (radians)
+            right_antenna: Target right antenna position (radians)
+            duration: Transition duration in seconds
+            degrees: Whether head angles are in degrees
+        """
+        # Validate and clamp angles
+        if degrees:
+            roll, pitch, yaw = self.clamp_head_angles(roll, pitch, yaw, degrees=True)
+        else:
+            roll, pitch, yaw = self.clamp_head_angles(roll, pitch, yaw, degrees=False)
+        
+        left_antenna, right_antenna = self.clamp_antenna_positions(left_antenna, right_antenna)
+        
+        self.logger.debug(f"Transitioning to pose: roll={roll}, pitch={pitch}, yaw={yaw}")
+        
+        # Execute movements simultaneously
+        robot.move_head(roll=roll, pitch=pitch, yaw=yaw, duration=duration, degrees=degrees)
+        robot.move_antennas(left=left_antenna, right=right_antenna, duration=duration)
+        time.sleep(duration)
+    
+    def return_to_neutral(self, robot: "ReachyWrapper", duration: float = 1.0) -> None:
+        """Return robot to neutral pose.
+        
+        Args:
+            robot: ReachyWrapper instance to control
+            duration: Transition duration in seconds
+        """
+        self.logger.info("Returning to neutral pose")
+        self.transition_to_pose(robot, duration=duration, degrees=True)

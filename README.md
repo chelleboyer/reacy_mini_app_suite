@@ -13,7 +13,13 @@ This project provides a collection of independent, CM4-friendly apps that make R
 - `ReachyWrapper` provides high-level robot control API
 - Physical hardware tested and validated (USB connection)
 - Daemon running stably on real robot
-- Test infrastructure in place (10 tests passing, 32% coverage)
+- Test infrastructure in place (9 tests passing, 29% coverage)
+
+✅ **Story 1.3 Complete** - SafeMotionController with gesture library
+- 8 pre-defined gestures (nod, shake, tilt, wave, look around, etc.)
+- 5 emotion expressions (happy, sad, curious, confused, excited)
+- Smooth pose transitions with safety validation
+- All movements respect joint limits and velocity constraints
 
 ### Featured Apps (Planned)
 
@@ -112,9 +118,46 @@ with ReachyWrapper(media_backend="no_media") as robot:
     pose = robot.get_head_pose()
 ```
 
-Run the demo:
+Run the demos:
 ```bash
+# Simple movement demo
 python examples/simple_demo.py
+
+# Gesture and expression showcase
+python examples/gesture_demo.py
+
+# Full gesture library test (comprehensive)
+python examples/test_gestures.py
+```
+
+### Using SafeMotionController
+
+The gesture library provides pre-defined behaviors:
+
+```python
+from src.common.reachy.robot_wrapper import ReachyWrapper
+from src.common.reachy.safe_motions import SafeMotionController
+
+with ReachyWrapper(media_backend="no_media") as robot:
+    controller = SafeMotionController()
+    
+    # Gestures
+    controller.nod_yes(robot, count=2)
+    controller.shake_no(robot, count=2)
+    controller.wave_antennas(robot, count=3)
+    controller.look_around(robot)
+    
+    # Expressions
+    controller.express_happy(robot)
+    controller.express_curious(robot)
+    controller.express_thinking(robot)
+    
+    # Custom poses with validation
+    controller.transition_to_pose(
+        robot, roll=10, pitch=-5, yaw=15,
+        left_antenna=0.5, right_antenna=-0.5,
+        duration=1.5, degrees=True
+    )
 ```
 
 ### Running Apps (Coming Soon)
