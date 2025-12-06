@@ -333,31 +333,139 @@ class MotionEngine:
 
 
 # ============================================================
-# PLACEHOLDER HANDLERS (Story 3-4 - State management)
+# STATE MANAGEMENT (Story 3)
 # ============================================================
 
-def on_move_click(move_name: str):
-    """Placeholder handler for move button clicks."""
-    print(f"[DEBUG] Move clicked: {move_name}")
-    return f"Added {move_name} to sequence (Story 3)"
+class PlayState(Enum):
+    """Playback state machine states."""
+    IDLE = "idle"
+    PLAYING = "playing"
+    ERROR = "error"
 
 
-def on_play_click():
-    """Placeholder handler for play button."""
-    print("[DEBUG] Play clicked")
-    return "Play functionality coming in Story 4"
+class AppState:
+    """Application state manager.
+    
+    Manages playback state and enforces state machine transitions.
+    """
+    
+    def __init__(self):
+        """Initialize app state."""
+        self.current_state = PlayState.IDLE
+        self.sequence: List[str] = []
+        self.error_message: Optional[str] = None
+    
+    def can_play(self) -> bool:
+        """Check if sequence can be played.
+        
+        Returns:
+            True if in IDLE state and sequence is not empty
+        """
+        return self.current_state == PlayState.IDLE and len(self.sequence) > 0
+    
+    def start_playing(self) -> None:
+        """Transition from IDLE to PLAYING state."""
+        if self.current_state == PlayState.IDLE:
+            self.current_state = PlayState.PLAYING
+            self.error_message = None
+        else:
+            raise ValueError(f"Cannot start playing from {self.current_state}")
+    
+    def finish_playing(self) -> None:
+        """Transition from PLAYING to IDLE state."""
+        if self.current_state == PlayState.PLAYING:
+            self.current_state = PlayState.IDLE
+        else:
+            raise ValueError(f"Cannot finish playing from {self.current_state}")
+    
+    def set_error(self, message: str) -> None:
+        """Transition to ERROR state with message.
+        
+        Args:
+            message: Error message to store
+        """
+        self.current_state = PlayState.ERROR
+        self.error_message = message
+    
+    def reset(self) -> None:
+        """Reset to IDLE state (for error recovery)."""
+        self.current_state = PlayState.IDLE
+        self.error_message = None
 
 
-def on_undo_click():
-    """Placeholder handler for undo button."""
-    print("[DEBUG] Undo clicked")
-    return "Undo functionality coming in Story 3"
-
-
-def on_clear_click():
-    """Placeholder handler for clear button."""
-    print("[DEBUG] Clear clicked")
-    return "Clear functionality coming in Story 3"
+class SequenceBuilder:
+    """Sequence building and display formatting.
+    
+    Manages the move sequence and converts to emoji display format.
+    """
+    
+    # Emoji mapping for moves
+    EMOJI_MAP = {
+        "wave": "👋",
+        "robot_pose": "🤖",
+        "spin": "💃",
+        "stretch": "🙆",
+        "dab": "🕺",
+        "pause": "⏸",
+    }
+    
+    # Empty state message
+    EMPTY_MESSAGE = "Tap moves above to build your dance! 🎵"
+    
+    def __init__(self):
+        """Initialize sequence builder."""
+        self.moves: List[str] = []
+    
+    def add_move(self, move_id: str) -> str:
+        """Add a move to the sequence.
+        
+        Args:
+            move_id: Move identifier to add
+            
+        Returns:
+            Formatted sequence display string
+        """
+        self.moves.append(move_id)
+        return self.format_sequence()
+    
+    def undo_last(self) -> str:
+        """Remove the last move from sequence.
+        
+        Returns:
+            Updated sequence display string
+        """
+        if self.moves:
+            self.moves.pop()
+        return self.format_sequence()
+    
+    def clear_all(self) -> str:
+        """Clear entire sequence.
+        
+        Returns:
+            Empty state message
+        """
+        self.moves.clear()
+        return self.format_sequence()
+    
+    def format_sequence(self) -> str:
+        """Format sequence as emoji display.
+        
+        Returns:
+            Formatted string with emojis or empty message
+        """
+        if not self.moves:
+            return self.EMPTY_MESSAGE
+        
+        emojis = [self.EMOJI_MAP.get(move, "❓") for move in self.moves]
+        return f"Your Dance: {' '.join(emojis)}"
+    
+    def get_sequence(self) -> List[str]:
+        """Get current move sequence.
+        
+        Returns:
+            List of move IDs
+        """
+        return self.moves.copy()
 
 
 # ============================================================
@@ -366,6 +474,36 @@ def on_clear_click():
 
 def create_app():
     """Create and configure the Gradio application."""
+    
+    # Initialize state (Story 3)
+    app_state = AppState()
+    sequence_builder = SequenceBuilder()
+    
+    # Handler functions with state management
+    def on_move_click(move_id: str):
+        """Handle move button click - adds move to sequence."""
+        display = sequence_builder.add_move(move_id)
+        app_state.sequence = sequence_builder.get_sequence()
+        return display, "Ready! 🎉"
+    
+    def on_undo_click():
+        """Handle undo button click - removes last move."""
+        display = sequence_builder.undo_last()
+        app_state.sequence = sequence_builder.get_sequence()
+        return display, "Ready! 🎉" if sequence_builder.moves else "Add some moves to get started! 🎵"
+    
+    def on_clear_click():
+        """Handle clear button click - clears all moves."""
+        display = sequence_builder.clear_all()
+        app_state.sequence = sequence_builder.get_sequence()
+        app_state.reset()  # Reset any error state
+        return display, "Cleared! Ready for a new dance! 🧹"
+    
+    def on_play_click():
+        """Placeholder for play button (Story 4)."""
+        if not app_state.can_play():
+            return sequence_builder.format_sequence(), "Add at least one move first! 🙂"
+        return sequence_builder.format_sequence(), "Play functionality coming in Story 4! ▶️"
     
     with gr.Blocks(title="🎵 Reachy Remix") as app:
         
@@ -467,54 +605,54 @@ def create_app():
         )
         
         # ========================================
-        # EVENT HANDLERS (Placeholders for Story 1)
+        # EVENT HANDLERS (Story 3 - State Management)
         # ========================================
         
-        # Move button clicks
+        # Move button clicks - add moves to sequence
         btn_wave.click(
-            fn=lambda: on_move_click("Wave"),
-            outputs=[status_display]
+            fn=lambda: on_move_click("wave"),
+            outputs=[sequence_display, status_display]
         )
         
         btn_robot.click(
-            fn=lambda: on_move_click("Robot Pose"),
-            outputs=[status_display]
+            fn=lambda: on_move_click("robot_pose"),
+            outputs=[sequence_display, status_display]
         )
         
         btn_spin.click(
-            fn=lambda: on_move_click("Spin"),
-            outputs=[status_display]
+            fn=lambda: on_move_click("spin"),
+            outputs=[sequence_display, status_display]
         )
         
         btn_stretch.click(
-            fn=lambda: on_move_click("Stretch"),
-            outputs=[status_display]
+            fn=lambda: on_move_click("stretch"),
+            outputs=[sequence_display, status_display]
         )
         
         btn_dab.click(
-            fn=lambda: on_move_click("Dab"),
-            outputs=[status_display]
+            fn=lambda: on_move_click("dab"),
+            outputs=[sequence_display, status_display]
         )
         
         btn_pause.click(
-            fn=lambda: on_move_click("Pause"),
-            outputs=[status_display]
+            fn=lambda: on_move_click("pause"),
+            outputs=[sequence_display, status_display]
         )
         
         # Control button clicks
         btn_play.click(
             fn=on_play_click,
-            outputs=[status_display]
+            outputs=[sequence_display, status_display]
         )
         
         btn_undo.click(
             fn=on_undo_click,
-            outputs=[status_display]
+            outputs=[sequence_display, status_display]
         )
         
         btn_clear.click(
             fn=on_clear_click,
-            outputs=[status_display]
+            outputs=[sequence_display, status_display]
         )
     
     return app

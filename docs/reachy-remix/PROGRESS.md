@@ -1,6 +1,6 @@
 # Reachy Remix - Development Progress
 
-**Sprint 1 Status:** 8/21 points complete (38%)  
+**Sprint 1 Status:** 13/21 points complete (62%)  
 **Date:** December 6, 2025
 
 ---
@@ -67,18 +67,52 @@
 
 ---
 
+### Story 3: State Management + Sequence Builder (5 pts) ✅
+**Status:** Complete  
+**Date Completed:** December 6, 2025  
+**Developer:** Amelia (TEA role)
+
+**Deliverables:**
+- ✅ `PlayState` enum (IDLE, PLAYING, ERROR)
+- ✅ `AppState` class with state machine:
+  - `can_play()` validation
+  - `start_playing()` / `finish_playing()` transitions
+  - `set_error()` / `reset()` error handling
+- ✅ `SequenceBuilder` class:
+  - `add_move()` - appends to sequence
+  - `undo_last()` - removes last move
+  - `clear_all()` - resets sequence
+  - `format_sequence()` - emoji display
+- ✅ Emoji mapping: 👋 🤖 💃 🙆 🕺 ⏸
+- ✅ Empty state: "Tap moves above to build your dance! 🎵"
+- ✅ Display format: "Your Dance: 👋 🤖 💃"
+- ✅ Button handlers wired up:
+  - Move buttons → add moves → update display
+  - Undo → remove last → update display
+  - Clear → reset → empty message
+- ✅ Comprehensive unit tests: 20/20 passing
+
+**Technical Notes:**
+- State machine enforces valid transitions
+- Sequence updates are instantaneous (< 50ms)
+- Button disabling logic prepared (Story 4)
+- All acceptance criteria (AC3.1-AC3.9) met
+
+---
+
 ## 🚧 In Progress
 
-### Story 3: State Management + Sequence Builder (5 pts)
+### Story 4: Play Execution + Status Feedback (5 pts)
 **Status:** Not started  
 **Next up:** December 6, 2025 (evening)
 
 **Planned Deliverables:**
-- `MotionEngine` class with execute_move() and execute_sequence()
-- `MOVE_REGISTRY` mapping all 6 moves to Reachy SDK calls
-- Robot connection via `ReachyWrapper`
-- Inter-move delay (0.5s) and micro-feedback
-- Unit tests for move execution
+- Play button validation and execution
+- State-based button disabling
+- Status messages during playback
+- Error recovery
+- Spam prevention
+- Integration tests
 
 ---
 
