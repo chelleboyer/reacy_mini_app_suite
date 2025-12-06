@@ -496,6 +496,145 @@ class SafeMotionController:
         time.sleep(0.4)
     
     # ============================================================
+    # SINGING-SPECIFIC GESTURES
+    # ============================================================
+    
+    def singing_sway(
+        self,
+        robot: "ReachyWrapper",
+        duration: float = 2.0,
+        magnitude: float = 10.0
+    ) -> None:
+        """Gentle swaying motion for singing (side to side).
+        
+        Args:
+            robot: ReachyWrapper instance to control
+            duration: Duration of one complete sway cycle
+            magnitude: Sway angle in degrees
+        """
+        self.logger.info(f"Singing sway (duration={duration}s, magnitude={magnitude}°)")
+        
+        half_duration = duration / 2
+        
+        # Sway right
+        robot.move_head(roll=magnitude, duration=half_duration, degrees=True)
+        time.sleep(half_duration)
+        
+        # Sway left
+        robot.move_head(roll=-magnitude, duration=duration, degrees=True)
+        time.sleep(duration)
+        
+        # Return to center
+        robot.move_head(roll=0, duration=half_duration, degrees=True)
+        time.sleep(half_duration)
+    
+    def singing_lean_forward(
+        self,
+        robot: "ReachyWrapper",
+        duration: float = 1.0,
+        intensity: float = 0.8
+    ) -> None:
+        """Lean forward dramatically (e.g., belt out a note).
+        
+        Args:
+            robot: ReachyWrapper instance to control
+            duration: Duration to hold the lean
+            intensity: Lean intensity (0.0 to 1.0)
+        """
+        angle = -15 * intensity  # Negative pitch = forward
+        self.logger.info(f"Singing lean forward (angle={angle}°, duration={duration}s)")
+        
+        # Lean forward
+        robot.move_head(pitch=angle, duration=0.4, degrees=True)
+        robot.move_antennas(left=0.5, right=-0.5, duration=0.4)
+        time.sleep(0.4)
+        
+        # Hold
+        time.sleep(duration)
+        
+        # Return
+        robot.move_head(pitch=0, duration=0.6, degrees=True)
+        robot.move_antennas(left=0, right=0, duration=0.6)
+        time.sleep(0.6)
+    
+    def singing_dramatic_pause(
+        self,
+        robot: "ReachyWrapper",
+        duration: float = 1.5
+    ) -> None:
+        """Dramatic pause with head tilt (suspense before big note).
+        
+        Args:
+            robot: ReachyWrapper instance to control
+            duration: Duration of the pause
+        """
+        self.logger.info(f"Singing dramatic pause ({duration}s)")
+        
+        # Tilt head slightly, antennas perk up
+        robot.move_head(roll=8, pitch=-5, duration=0.5, degrees=True)
+        robot.move_antennas(left=0.6, right=-0.6, duration=0.5)
+        time.sleep(0.5)
+        
+        # Hold the pose
+        time.sleep(duration)
+        
+        # Quick return to neutral
+        robot.move_head(roll=0, pitch=0, duration=0.3, degrees=True)
+        robot.move_antennas(left=0, right=0, duration=0.3)
+        time.sleep(0.3)
+    
+    def singing_big_finish(self, robot: "ReachyWrapper") -> None:
+        """Triumphant ending gesture for song finale.
+        
+        Args:
+            robot: ReachyWrapper instance to control
+        """
+        self.logger.info("Singing BIG FINISH!")
+        
+        # Build up - lean back
+        robot.move_head(pitch=10, duration=0.8, degrees=True)
+        time.sleep(0.8)
+        
+        # FINALE - arms up (antennas), look up
+        robot.move_head(pitch=-20, duration=0.4, degrees=True)
+        robot.move_antennas(left=0.9, right=-0.9, duration=0.4)
+        time.sleep(0.5)
+        
+        # Hold triumphant pose
+        time.sleep(1.5)
+        
+        # Slow, satisfied return to neutral
+        robot.move_head(pitch=0, duration=1.0, degrees=True)
+        robot.move_antennas(left=0, right=0, duration=1.0)
+        time.sleep(1.0)
+    
+    def singing_bashful_bow(self, robot: "ReachyWrapper") -> None:
+        """Shy/bashful bow after performance (aww, shucks).
+        
+        Args:
+            robot: ReachyWrapper instance to control
+        """
+        self.logger.info("Singing bashful bow")
+        
+        # Look down shyly
+        robot.move_head(pitch=15, roll=8, duration=0.8, degrees=True)
+        robot.move_antennas(left=-0.3, right=0.3, duration=0.8)
+        time.sleep(1.2)
+        
+        # Quick peek up
+        robot.move_head(pitch=5, duration=0.4, degrees=True)
+        time.sleep(0.6)
+        
+        # Back to shy
+        robot.move_head(pitch=12, duration=0.5, degrees=True)
+        time.sleep(1.0)
+        
+        # Finally return to neutral
+        robot.move_head(pitch=0, roll=0, duration=0.8, degrees=True)
+        robot.move_antennas(left=0, right=0, duration=0.8)
+        time.sleep(0.8)
+    
+    # ============================================================
     # SMOOTH TRANSITIONS
     # ============================================================
     

@@ -13,7 +13,7 @@ This project provides a collection of independent, CM4-friendly apps that make R
 - `ReachyWrapper` provides high-level robot control API
 - Physical hardware tested and validated (USB connection)
 - Daemon running stably on real robot
-- Test infrastructure in place (9 tests passing, 29% coverage)
+- Test infrastructure in place
 
 ✅ **Story 1.3 Complete** - SafeMotionController with gesture library
 - 8 pre-defined gestures (nod, shake, tilt, wave, look around, etc.)
@@ -21,12 +21,20 @@ This project provides a collection of independent, CM4-friendly apps that make R
 - Smooth pose transitions with safety validation
 - All movements respect joint limits and velocity constraints
 
-### Featured Apps (Planned)
+✅ **Story 3.0 Complete** - Music-Reactive Dance App 🎵💃
+- **Robot dances to ANY music!** Listens via microphone and responds with appropriate emotions
+- 3 emotion detection: Happy, Sad, Energetic (based on tempo, energy, valence)
+- Real-time synchronized motion + gestures + emotion-matching sounds
+- 80ms audio latency, 3-second emotion analysis, 2-second gesture cycles
 
-- **OOBE Demo Menu** - Main launcher and demo hub for first-time users
-- **Reachy Sings** - Robot singing performances in various styles
-- **Karaoke Duet** - Sing along with Reachy, with lyrics on your phone
-- **Duet Stage** - Two-Reachy synchronized performances
+### Featured Apps
+
+- **Reachy Remix** 🎵🤖 - **IN DEVELOPMENT!** Scratch-lite motion builder for kids (Story 1/5 complete)
+- **Music-Reactive Dance** 🎵💃 - **NOW AVAILABLE!** Reachy dances to any music with emotional expressions
+- **OOBE Demo Menu** - Main launcher and demo hub for first-time users (Planned)
+- **Reachy Sings** - Robot singing performances in various styles (In Progress)
+- **Karaoke Duet** - Sing along with Reachy, with lyrics on your phone (Planned)
+- **Duet Stage** - Two-Reachy synchronized performances (Planned)
 
 ## Project Structure
 
@@ -120,6 +128,9 @@ with ReachyWrapper(media_backend="no_media") as robot:
 
 Run the demos:
 ```bash
+# Activate virtual environment first
+source venv/bin/activate
+
 # Simple movement demo
 python examples/simple_demo.py
 
@@ -128,6 +139,9 @@ python examples/gesture_demo.py
 
 # Full gesture library test (comprehensive)
 python examples/test_gestures.py
+
+# NEW: Reachy Remix motion builder (Story 1 - UI only)
+python src/apps/reachy-remix/reachy_remix.py
 ```
 
 ### Using SafeMotionController

@@ -18,6 +18,7 @@ aiohttp>=3.9.0
 # Audio handling
 sounddevice>=0.4.6
 soundfile>=0.12.1
+librosa>=0.10.0  # Music analysis and emotion detection
 
 # Configuration and utilities
 python-dotenv>=1.0.0
@@ -31,3 +32,4 @@ reachy-mini>=1.1.2
 # huggingface-hub>=0.19.0
 # transformers>=4.35.0
 # Install with: pip install reachy_mini
+sounddevice
