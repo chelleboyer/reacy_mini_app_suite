@@ -75,16 +75,19 @@ custom_css = """
 
 /* AC5.2: Sequence display animations */
 .sequence-display {
-    background: linear-gradient(135deg, #667eea22 0%, #764ba222 100%);
-    padding: 25px;
-    border-radius: 15px;
-    font-size: 1.5em;
-    text-align: center;
-    min-height: 80px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
+    background: linear-gradient(135deg, #667eea22 0%, #764ba222 100%) !important;
+    padding: 25px !important;
+    border-radius: 15px !important;
+    text-align: center !important;
+    min-height: 120px !important;
+    font-size: 3em !important;
+    transition: all 0.3s ease !important;
+}
+
+.sequence-display h1 {
+    font-size: 2.5em !important;
+    line-height: 1.2 !important;
+    margin: 10px 0 !important;
 }
 
 /* Bounce animation for new emojis */
@@ -560,8 +563,10 @@ class SequenceBuilder:
         if not self.moves:
             return self.EMPTY_MESSAGE
         
+        # Create emoji string with spacing
         emojis = [self.EMOJI_MAP.get(move, "❓") for move in self.moves]
-        return f"Your Dance: {' '.join(emojis)}"
+        emoji_string = "  ".join(emojis)  # Double space for better visibility
+        return f"**Your Dance:**\n\n# {emoji_string}"
     
     def get_sequence(self) -> List[str]:
         """Get current move sequence.
@@ -588,6 +593,7 @@ def create_app():
         """Handle move button click - adds move to sequence."""
         display = sequence_builder.add_move(move_id)
         app_state.sequence = sequence_builder.get_sequence()
+        print(f"[DEBUG] Added move: {move_id}, Display: {display[:50]}...")  # Debug output
         # AC5.3: Enable undo button when moves exist
         return (
             display,
