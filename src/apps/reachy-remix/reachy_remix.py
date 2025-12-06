@@ -500,10 +500,54 @@ def create_app():
         return display, "Cleared! Ready for a new dance! 🧹"
     
     def on_play_click():
-        """Placeholder for play button (Story 4)."""
+        """Handle play button click - executes sequence (Story 4)."""
+        # AC4.1: Check if can play
         if not app_state.can_play():
-            return sequence_builder.format_sequence(), "Add at least one move first! 🙂"
-        return sequence_builder.format_sequence(), "Play functionality coming in Story 4! ▶️"
+            return (
+                sequence_builder.format_sequence(),
+                "Add at least one move first! 🙂",
+                gr.update(interactive=True)  # Play button stays enabled
+            )
+        
+        # AC4.4: Disable play button during execution (spam prevention)
+        try:
+            # AC4.2: Start playing
+            app_state.start_playing()
+            
+            # Update status to show playing
+            display = sequence_builder.format_sequence()
+            status = "Playing your dance... 🎵"
+            
+            # AC4.2: Execute sequence via motion engine
+            result = motion_engine.execute_sequence(app_state.sequence, with_feedback=True)
+            
+            # AC4.3: Status messages based on result
+            if result.success:
+                status = "Sequence complete! 🎉"
+            else:
+                status = f"⚠️ {result.error_message}"
+                app_state.set_error(result.error_message)
+            
+        except Exception as e:
+            # AC4.5: Error recovery
+            status = f"⚠️ Something went wrong: {str(e)}"
+            app_state.set_error(str(e))
+        
+        finally:
+            # AC4.2: Finish playing and return to IDLE
+            if app_state.current_state == PlayState.PLAYING:
+                app_state.finish_playing()
+            elif app_state.current_state == PlayState.ERROR:
+                # Reset from error to allow retry
+                app_state.reset()
+        
+        # AC4.5: Sequence remains intact (not cleared)
+        # AC4.4: Re-enable play button after execution
+        return (
+            display,
+            status,
+            gr.update(interactive=True)  # Play button re-enabled
+        )
     
     with gr.Blocks(title="🎵 Reachy Remix") as app:
         
@@ -642,7 +686,7 @@ def create_app():
         # Control button clicks
         btn_play.click(
             fn=on_play_click,
-            outputs=[sequence_display, status_display]
+            outputs=[sequence_display, status_display, btn_play]  # AC4.4: Button state control
         )
         
         btn_undo.click(

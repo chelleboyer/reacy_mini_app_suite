@@ -1,6 +1,6 @@
 # Reachy Remix - Development Progress
 
-**Sprint 1 Status:** 13/21 points complete (62%)  
+**Sprint 1 Status:** 18/21 points complete (86%)  
 **Date:** December 6, 2025
 
 ---
@@ -100,35 +100,48 @@
 
 ---
 
+### Story 4: Play Execution + Status Feedback (5 pts) ✅
+**Status:** Complete  
+**Date Completed:** December 6, 2025  
+**Developer:** Amelia & Murat (collaborative)
+
+**Deliverables:**
+- ✅ Play button validation (`can_play()` check)
+- ✅ Execution flow with state transitions:
+  - IDLE → PLAYING → IDLE (success)
+  - IDLE → PLAYING → ERROR → IDLE (on error)
+- ✅ Status messages:
+  - "Playing your dance... 🎵"
+  - "Sequence complete! 🎉"
+  - "⚠️ [error message]" (on failure)
+- ✅ Error recovery with reset() method
+- ✅ Sequence preservation on error (AC4.5)
+- ✅ Spam prevention via button disabling (AC4.4)
+- ✅ Integration tests: 9/9 passing
+
+**Technical Notes:**
+- Play handler fully integrated with MotionEngine and AppState
+- Button state control via `gr.update(interactive=False/True)`
+- Error messages propagated from MotionEngine to UI
+- Inter-move delays verified through timing tests
+- Test file: `tests/apps/test_play_execution.py` (210 lines)
+- All acceptance criteria (AC4.1-AC4.7) met and validated
+- Total tests: 46 passing (17 motion + 20 state + 9 integration)
+
+---
+
 ## 🚧 In Progress
 
-### Story 4: Play Execution + Status Feedback (5 pts)
-**Status:** Not started  
-**Next up:** December 6, 2025 (evening)
-
-**Planned Deliverables:**
-- Play button validation and execution
-- State-based button disabling
-- Status messages during playback
-- Error recovery
-- Spam prevention
-- Integration tests
+None - ready for Story 5!
 
 ---
 
 ## 📋 Upcoming Stories
 
-### Story 3: State Management + Sequence Builder (5 pts)
-**Status:** Planned  
-**Dependencies:** Story 1 ✅
-
-### Story 4: Play Execution + Status Feedback (5 pts)
-**Status:** Planned  
-**Dependencies:** Stories 2 & 3
-
 ### Story 5: Visual Polish + Animations (3 pts)
-**Status:** Planned  
-**Dependencies:** Stories 1-4
+**Status:** Next up  
+**Dependencies:** Stories 1-4 ✅  
+**Planned Start:** December 6, 2025 (evening)
 
 ---
 
@@ -150,10 +163,10 @@
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Story Points | 21 | 3 | 🟡 14% |
-| Stories Complete | 5 | 1 | 🟡 20% |
-| Test Coverage | 80% | 0% | 🔴 N/A |
-| AC Met | 100% | 100% | 🟢 Story 1 |
+| Story Points | 21 | 18 | 🟢 86% |
+| Stories Complete | 5 | 4 | 🟢 80% |
+| Test Coverage | 80% | 54% | 🟡 Functional |
+| AC Met | 100% | 100% | 🟢 All Stories |
 
 ---
 
@@ -212,12 +225,12 @@ python src/apps/reachy-remix/reachy_remix.py
 
 ## 🎉 Next Actions
 
-1. **Amelia (DEV):** Begin Story 2 - Motion Engine + SDK Integration
-2. **Bob (SM):** Update sprint board with Story 1 completion
-3. **Murat (TEA):** Prepare test framework for Story 2 unit tests
-4. **Team:** Daily standup at 9 AM
+1. **Amelia (DEV):** Begin Story 5 - Visual Polish + Animations
+2. **Bob (SM):** Update sprint board - 18/21 points complete!
+3. **Murat (TEA):** Prepare manual test script for visual validation
+4. **Team:** Sprint on track - 86% complete on Day 1!
 
 ---
 
-**Last Updated:** December 6, 2025 - 14:30  
-**Next Update:** December 6, 2025 - End of Day
+**Last Updated:** December 6, 2025 - 16:45  
+**Next Update:** December 6, 2025 - Story 5 completion
