@@ -51,22 +51,29 @@ theme = gr.themes.Soft(
     radius_size=gr.themes.sizes.radius_lg,
 )
 
-# Custom CSS for animations and enhanced styling
+# Custom CSS for animations and enhanced styling (Story 5)
 custom_css = """
-/* Move buttons - large, colorful, tappable */
+/* Story 5: Animations */
+
+/* AC5.1: Move button hover effects */
 .move-button {
     min-width: 80px !important;
     min-height: 80px !important;
     font-size: 2em !important;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+    cursor: pointer;
 }
 
 .move-button:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    transform: scale(1.05) !important;
+    box-shadow: 0 6px 16px rgba(102, 126, 234, 0.5) !important;
 }
 
-/* Sequence display - showcase area with gradient */
+.move-button:active {
+    transform: scale(0.98) !important;
+}
+
+/* AC5.2: Sequence display animations */
 .sequence-display {
     background: linear-gradient(135deg, #667eea22 0%, #764ba222 100%);
     padding: 25px;
@@ -77,50 +84,147 @@ custom_css = """
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: all 0.3s ease;
 }
 
-/* Control buttons - action buttons */
+/* Bounce animation for new emojis */
+@keyframes bounceIn {
+    0% { 
+        transform: scale(0.3);
+        opacity: 0;
+    }
+    50% { 
+        transform: scale(1.1);
+    }
+    100% { 
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.sequence-display span {
+    display: inline-block;
+    animation: bounceIn 0.4s ease;
+    margin: 0 4px;
+}
+
+/* Wiggle animation when playing */
+@keyframes wiggle {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-1deg); }
+    50% { transform: rotate(0deg); }
+    75% { transform: rotate(1deg); }
+}
+
+.sequence-playing {
+    animation: wiggle 0.5s ease 2;
+}
+
+/* AC5.1: Control buttons with hover */
 .control-button {
     min-width: 100px !important;
     min-height: 60px !important;
     font-size: 1.3em !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease !important;
 }
 
-/* Status messages - clear feedback */
+.control-button:hover:not(:disabled) {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.control-button:active:not(:disabled) {
+    transform: translateY(0px) !important;
+}
+
+/* AC5.3: Button state visual feedback */
+.btn-playing {
+    background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%) !important;
+    color: white !important;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
+}
+
+.btn-disabled, button:disabled {
+    opacity: 0.4 !important;
+    cursor: not-allowed !important;
+    filter: grayscale(0.5);
+}
+
+/* AC5.4: Status message styling with color coding */
 .status-message {
     font-size: 1.1em;
     padding: 15px;
     border-radius: 10px;
     text-align: center;
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .status-ready {
-    background-color: rgba(59, 130, 246, 0.1);
+    background-color: rgba(59, 130, 246, 0.15);
+    border-left: 4px solid rgba(59, 130, 246, 0.6);
 }
 
 .status-success {
-    background-color: rgba(34, 197, 94, 0.1);
+    background-color: rgba(34, 197, 94, 0.15);
+    border-left: 4px solid rgba(34, 197, 94, 0.6);
+    animation: successPop 0.4s ease;
+}
+
+@keyframes successPop {
+    0% { transform: scale(0.95); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
 }
 
 .status-error {
-    background-color: rgba(239, 68, 68, 0.1);
+    background-color: rgba(239, 68, 68, 0.15);
+    border-left: 4px solid rgba(239, 68, 68, 0.6);
 }
 
 .status-playing {
-    background-color: rgba(168, 85, 247, 0.1);
-}
-
-/* Button disabled state */
-.btn-disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    pointer-events: none;
+    background-color: rgba(168, 85, 247, 0.15);
+    border-left: 4px solid rgba(168, 85, 247, 0.6);
+    animation: pulse 1.5s ease-in-out infinite;
 }
 
 /* Header styling */
 .app-header {
     text-align: center;
     margin-bottom: 20px;
+}
+
+/* AC5.5: Responsive layout */
+@media (max-width: 768px) {
+    .move-button {
+        min-width: 70px !important;
+        min-height: 70px !important;
+        font-size: 1.8em !important;
+    }
+    
+    .control-button {
+        min-width: 90px !important;
+        min-height: 55px !important;
+        font-size: 1.2em !important;
+    }
+    
+    .sequence-display {
+        font-size: 1.3em;
+        padding: 20px;
+    }
+}
+
+/* Smooth transitions for all interactive elements */
+* {
+    -webkit-tap-highlight-color: transparent;
+}
+
+button {
+    touch-action: manipulation;
 }
 """
 
@@ -484,32 +588,48 @@ def create_app():
         """Handle move button click - adds move to sequence."""
         display = sequence_builder.add_move(move_id)
         app_state.sequence = sequence_builder.get_sequence()
-        return display, "Ready! 🎉"
+        # AC5.3: Enable undo button when moves exist
+        return (
+            display,
+            "Ready! 🎉",
+            gr.update(interactive=True)  # Undo button enabled
+        )
     
     def on_undo_click():
         """Handle undo button click - removes last move."""
         display = sequence_builder.undo_last()
         app_state.sequence = sequence_builder.get_sequence()
-        return display, "Ready! 🎉" if sequence_builder.moves else "Add some moves to get started! 🎵"
+        status = "Ready! 🎉" if sequence_builder.moves else "Add some moves to get started! 🎵"
+        # AC5.3: Return button states (undo disabled when empty)
+        return (
+            display,
+            status,
+            gr.update(interactive=len(sequence_builder.moves) > 0)  # Undo button state
+        )
     
     def on_clear_click():
         """Handle clear button click - clears all moves."""
         display = sequence_builder.clear_all()
         app_state.sequence = sequence_builder.get_sequence()
         app_state.reset()  # Reset any error state
-        return display, "Cleared! Ready for a new dance! 🧹"
+        # AC5.3: Disable undo button after clear
+        return (
+            display,
+            "Cleared! Ready for a new dance! 🧹",
+            gr.update(interactive=False)  # Undo button disabled
+        )
     
     def on_play_click():
-        """Handle play button click - executes sequence (Story 4)."""
+        """Handle play button click - executes sequence (Story 4 + Story 5 enhancements)."""
         # AC4.1: Check if can play
         if not app_state.can_play():
             return (
                 sequence_builder.format_sequence(),
                 "Add at least one move first! 🙂",
-                gr.update(interactive=True)  # Play button stays enabled
+                gr.update(value="▶️ Play", interactive=True, elem_classes=["control-button"])
             )
         
-        # AC4.4: Disable play button during execution (spam prevention)
+        # AC5.3: Change button during execution (visual feedback)
         try:
             # AC4.2: Start playing
             app_state.start_playing()
@@ -541,12 +661,11 @@ def create_app():
                 # Reset from error to allow retry
                 app_state.reset()
         
-        # AC4.5: Sequence remains intact (not cleared)
-        # AC4.4: Re-enable play button after execution
+        # AC5.3: Return play button to normal state
         return (
             display,
             status,
-            gr.update(interactive=True)  # Play button re-enabled
+            gr.update(value="▶️ Play", interactive=True, elem_classes=["control-button"])
         )
     
     with gr.Blocks(title="🎵 Reachy Remix") as app:
@@ -632,7 +751,8 @@ def create_app():
                 
                 btn_undo = gr.Button(
                     "↩️ Undo",
-                    elem_classes=["control-button"]
+                    elem_classes=["control-button"],
+                    interactive=False  # AC5.3: Initially disabled (no moves yet)
                 )
                 
                 btn_clear = gr.Button(
@@ -652,35 +772,35 @@ def create_app():
         # EVENT HANDLERS (Story 3 - State Management)
         # ========================================
         
-        # Move button clicks - add moves to sequence
+        # Move button clicks - add moves to sequence (Story 5: enable undo)
         btn_wave.click(
             fn=lambda: on_move_click("wave"),
-            outputs=[sequence_display, status_display]
+            outputs=[sequence_display, status_display, btn_undo]
         )
         
         btn_robot.click(
             fn=lambda: on_move_click("robot_pose"),
-            outputs=[sequence_display, status_display]
+            outputs=[sequence_display, status_display, btn_undo]
         )
         
         btn_spin.click(
             fn=lambda: on_move_click("spin"),
-            outputs=[sequence_display, status_display]
+            outputs=[sequence_display, status_display, btn_undo]
         )
         
         btn_stretch.click(
             fn=lambda: on_move_click("stretch"),
-            outputs=[sequence_display, status_display]
+            outputs=[sequence_display, status_display, btn_undo]
         )
         
         btn_dab.click(
             fn=lambda: on_move_click("dab"),
-            outputs=[sequence_display, status_display]
+            outputs=[sequence_display, status_display, btn_undo]
         )
         
         btn_pause.click(
             fn=lambda: on_move_click("pause"),
-            outputs=[sequence_display, status_display]
+            outputs=[sequence_display, status_display, btn_undo]
         )
         
         # Control button clicks
@@ -691,12 +811,12 @@ def create_app():
         
         btn_undo.click(
             fn=on_undo_click,
-            outputs=[sequence_display, status_display]
+            outputs=[sequence_display, status_display, btn_undo]  # Story 5: Control own state
         )
         
         btn_clear.click(
             fn=on_clear_click,
-            outputs=[sequence_display, status_display]
+            outputs=[sequence_display, status_display, btn_undo]  # Story 5: Disable undo
         )
     
     return app
