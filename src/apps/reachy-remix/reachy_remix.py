@@ -1088,6 +1088,11 @@ def create_app():
                 '<div id="sequence-card" style="text-align: center; padding: 25px; font-size: 1.2em;">Tap moves below to build your dance! 🎵</div>'
             )
             
+            # Status (positioned right below sequence)
+            status_display = gr.HTML(
+                '<div class="alert alert-success">✅ <strong>Ready!</strong> Select moves to start.</div>'
+            )
+            
             # Move Buttons
             gr.HTML('<div class="section-title">🎨 Moves</div>')
             with gr.Row(elem_classes=["btn-grid"]):
@@ -1105,11 +1110,6 @@ def create_app():
                 btn_undo = gr.Button(value="↩️ Undo", elem_classes=["btn-warning"], interactive=False)
                 btn_play = gr.Button(value="▶️ Play Sequence", elem_classes=["btn-success"], variant="primary")
                 btn_clear = gr.Button(value="🗑️ Clear", elem_classes=["btn-danger"])
-            
-            # Status
-            status_display = gr.HTML(
-                '<div class="alert alert-success">✅ <strong>Ready!</strong> Select moves to start.</div>'
-            )
         
         # ========================================
         # EVENT HANDLERS
