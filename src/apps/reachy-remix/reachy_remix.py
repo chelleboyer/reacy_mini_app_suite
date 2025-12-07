@@ -291,12 +291,12 @@ def get_custom_css(theme_name="minty"):
 /* Sequence Display - Compact */
 #sequence-card {{
     background: linear-gradient(135deg, {card_bg} 0%, {theme_config["primary"]}10 100%) !important;
-    border: 2px solid {theme_config["primary"]}80 !important;
+    border: 3px solid {theme_config["primary"]} !important;
     border-radius: 10px !important;
     padding: 20px !important;
     margin: 15px 0 !important;
     min-height: 100px !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    box-shadow: 0 4px 12px {theme_config["primary"]}30 !important;
 }}
 
 /* Move Buttons - Compact with clear emojis */
@@ -313,9 +313,14 @@ button {{
     font-weight: 600 !important;
     color: white !important;
     transition: all 0.2s ease !important;
-    min-height: 80px !important;
-    min-width: 80px !important;
+    min-height: 100px !important;
+    max-height: 100px !important;
+    min-width: 150px !important;
+    width: 100% !important;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 }}
 
 .move-btn:hover {{
@@ -1160,6 +1165,12 @@ def create_app():
         else:
             return "🚀 Start Daemon", '<div class="alert alert-warning">⚠️ Daemon not running</div>'
     
+    def on_settings_toggle(settings_visible):
+        """Toggle settings panel visibility."""
+        # Toggle the visibility state
+        new_visibility = not settings_visible
+        return gr.update(visible=new_visibility)
+    
     def on_daemon_toggle():
         """Toggle daemon on/off."""
         import subprocess
@@ -1169,8 +1180,22 @@ def create_app():
         daemon_running, pid = is_daemon_running()
         
         if daemon_running:
-            # Stop the daemon
+            # Stop the daemon - put robot to sleep first
             try:
+                # Connect to robot and perform sleep sequence
+                if SDK_AVAILABLE:
+                    try:
+                        from src.common.reachy.robot_wrapper import ReachyWrapper
+                        print("[DAEMON] Putting robot to sleep before shutdown...")
+                        temp_robot = ReachyWrapper()
+                        temp_robot.connect()
+                        temp_robot.go_to_sleep()  # Use SDK's proper sleep method
+                        temp_robot.disconnect()
+                        print("[DAEMON] Robot in sleep position")
+                    except Exception as robot_error:
+                        print(f"[DAEMON] Could not perform sleep: {robot_error}")
+                
+                # Now stop the daemon
                 os.kill(pid, 9)
                 time.sleep(0.5)
                 status = '<div class="alert alert-warning">⏹️ Daemon stopped</div>'
@@ -1203,39 +1228,32 @@ def create_app():
         
         return button_text, status
     
-    with gr.Blocks(title="🎵 Reachy Remix") as app:
+    with gr.Blocks(title="🧪 Reachy Mini Lab") as app:
         
         # Inject custom CSS
         css_element = gr.HTML(f"<style id='custom-theme-style'>{custom_css}</style>")
         
-        # Daemon Control Bar
-        initial_btn_text, initial_status = get_daemon_status()
-        with gr.Row(elem_classes=["compact-header"]):
-            daemon_status = gr.HTML(initial_status)
-            daemon_toggle_btn = gr.Button(initial_btn_text, size="sm", scale=1)
+        # State for settings panel visibility
+        settings_visible = gr.State(False)
         
-        # Compact Header with App Mode Selector
+        # Main Header with Settings
         with gr.Row(elem_classes=["compact-header"]):
+            with gr.Column(scale=3):
+                gr.HTML('<h2>🧪 Reachy Mini Lab</h2>')
+                gr.HTML('<p style="font-size: 0.9em; margin: 0; opacity: 0.9;">Create your own movement patterns</p>')
+            with gr.Column(scale=1):
+                settings_toggle_btn = gr.Button("⚙️ Settings", size="sm", variant="secondary")
+        
+        # Settings Panel (collapsible)
+        with gr.Row(elem_classes=["compact-header"], visible=False) as settings_panel:
             with gr.Column(scale=2):
-                gr.HTML('<h2>🤖 Robot Dance Studio</h2>')
-                gr.HTML('<p style="font-size: 0.9em; margin: 0; opacity: 0.9;">Build amazing dance sequences!</p>')
+                # Daemon Control
+                initial_btn_text, initial_status = get_daemon_status()
+                with gr.Row():
+                    daemon_status = gr.HTML(initial_status)
+                    daemon_toggle_btn = gr.Button(initial_btn_text, size="sm")
             with gr.Column(scale=1):
-                gr.HTML('<p style="font-size: 0.8em; margin: 5px 0; font-weight: bold;">🎮 App Mode:</p>')
-                gr.HTML('''
-                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                        <button style="background: #4CAF50; color: white; border: 2px solid white; 
-                                       padding: 8px 12px; border-radius: 8px; font-size: 0.85em; font-weight: bold;
-                                       box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
-                            🎵 Reachy Remix
-                        </button>
-                        <button style="background: #999; color: white; border: 2px solid #666; 
-                                       padding: 8px 12px; border-radius: 8px; font-size: 0.85em;
-                                       opacity: 0.6; cursor: not-allowed;" title="Coming soon">
-                            📻 Reachy Radio
-                        </button>
-                    </div>
-                ''')
-            with gr.Column(scale=1):
+                # Theme selector
                 theme_selector = gr.Dropdown(
                     choices=list(TTKBOOTSTRAP_THEMES.keys()),
                     value=current_theme_name,
@@ -1298,6 +1316,17 @@ def create_app():
         # ========================================
         # EVENT HANDLERS
         # ========================================
+        
+        # Settings toggle
+        def toggle_settings(visible):
+            new_visible = not visible
+            return gr.update(visible=new_visible), new_visible
+        
+        settings_toggle_btn.click(
+            fn=toggle_settings, 
+            inputs=[settings_visible], 
+            outputs=[settings_panel, settings_visible]
+        )
         
         # Daemon control
         daemon_toggle_btn.click(fn=on_daemon_toggle, outputs=[daemon_toggle_btn, daemon_status])
