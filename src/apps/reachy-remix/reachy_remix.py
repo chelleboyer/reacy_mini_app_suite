@@ -1044,45 +1044,28 @@ def create_app():
         )
     
     def on_theme_change(theme_name):
-        """Handle theme change - updates CSS instantly via JavaScript."""
+        """Handle theme change - note: requires page refresh for full effect."""
         global current_theme_name, theme, custom_css
         current_theme_name = theme_name
         theme = create_theme(theme_name)
-        new_css = get_custom_css(theme_name)
+        custom_css = get_custom_css(theme_name)
         
         theme_display = TTKBOOTSTRAP_THEMES[theme_name]["name"]
-        # Escape quotes and newlines for JavaScript
-        escaped_css = new_css.replace('\\', '\\\\').replace("'", "\\'").replace('\n', ' ')
         
-        # Return JavaScript to update CSS and confirmation message
+        # Return updated CSS style tag and confirmation message
         return (
-            gr.update(value=f"""
-            <script>
-            (function() {{
-                // Remove old custom style
-                var oldStyle = document.getElementById('custom-theme-style');
-                if (oldStyle) oldStyle.remove();
-                
-                // Inject new custom style
-                var style = document.createElement('style');
-                style.id = 'custom-theme-style';
-                style.textContent = `{escaped_css}`;
-                document.head.appendChild(style);
-                console.log('Theme updated to {theme_name}');
-            }})();
-            </script>
-            """),
+            gr.update(value=f"<style id='custom-theme-style'>{custom_css}</style>"),
             gr.update(value=f"""
             <div style="padding: 10px 15px; background: linear-gradient(90deg, {TTKBOOTSTRAP_THEMES[theme_name]['primary']} 0%, {TTKBOOTSTRAP_THEMES[theme_name]['info']} 100%); 
                         border-radius: 6px; color: white; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
-                <strong>✨ Theme: {theme_display}</strong>
+                <strong>✨ Theme: {theme_display}</strong> - Refresh page to apply fully
             </div>
             """)
         )
     
     with gr.Blocks(title="🎵 Reachy Remix") as app:
         
-        # Inject custom CSS (will be updated dynamically via JavaScript)
+        # Inject custom CSS
         css_element = gr.HTML(f"<style id='custom-theme-style'>{custom_css}</style>")
         
         # Compact Header
@@ -1197,13 +1180,13 @@ if __name__ == "__main__":
     print("  - Test: Run sequence manually")
     print("=" * 50)
     
-    # Optional: Test sequence execution
-    if motion_engine.demo_mode:
-        print("\n🧪 Demo Test: Executing sample sequence...")
-        test_sequence = ["nod_yes", "wave", "happy"]
-        result = motion_engine.execute_sequence(test_sequence, with_feedback=False)
-        print(f"Test result: {'✅ Success' if result.success else '❌ Failed'}")
-        print()
+    # Optional: Test sequence execution (disabled for quick startup)
+    # if motion_engine.demo_mode:
+    #     print("\n🧪 Demo Test: Executing sample sequence...")
+    #     test_sequence = ["nod_yes", "wave", "happy"]
+    #     result = motion_engine.execute_sequence(test_sequence, with_feedback=False)
+    #     print(f"Test result: {'✅ Success' if result.success else '❌ Failed'}")
+    #     print()
     
     app = create_app()
     
