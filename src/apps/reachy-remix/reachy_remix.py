@@ -1044,7 +1044,7 @@ def create_app():
         )
     
     def on_theme_change(theme_name):
-        """Handle theme change - note: requires page refresh for full effect."""
+        """Handle theme change - updates CSS dynamically."""
         global current_theme_name, theme, custom_css
         current_theme_name = theme_name
         theme = create_theme(theme_name)
@@ -1052,15 +1052,10 @@ def create_app():
         
         theme_display = TTKBOOTSTRAP_THEMES[theme_name]["name"]
         
-        # Return updated CSS style tag and confirmation message
+        # Return updated CSS style tag and theme info
         return (
             gr.update(value=f"<style id='custom-theme-style'>{custom_css}</style>"),
-            gr.update(value=f"""
-            <div style="padding: 10px 15px; background: linear-gradient(90deg, {TTKBOOTSTRAP_THEMES[theme_name]['primary']} 0%, {TTKBOOTSTRAP_THEMES[theme_name]['info']} 100%); 
-                        border-radius: 6px; color: white; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
-                <strong>✨ Theme: {theme_display}</strong> - Refresh page to apply fully
-            </div>
-            """)
+            gr.update(value=f'<div style="font-size: 0.75em; opacity: 0.9; padding: 3px; color: white;">Current: <strong>{theme_display}</strong></div>')
         )
     
     with gr.Blocks(title="🎵 Reachy Remix") as app:
