@@ -271,7 +271,12 @@ def get_custom_css(theme_name="minty"):
     font-size: 1.3em !important;
     font-weight: 700 !important;
     color: white !important;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.2) !important;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3) !important;
+}}
+
+.compact-header p {{
+    color: rgba(255, 255, 255, 0.95) !important;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2) !important;
 }}
 
 /* Compact Container */
@@ -388,35 +393,46 @@ button {{
 }}
 
 .alert-success {{
-    background: {theme_config["success"]}20 !important;
+    background: {theme_config["success"]}30 !important;
     border-left-color: {theme_config["success"]} !important;
-    color: {text_color} !important;
+    color: {theme_config["fg"]} !important;
+    font-weight: 500 !important;
 }}
 
 .alert-info {{
-    background: {theme_config["info"]}20 !important;
+    background: {theme_config["info"]}30 !important;
     border-left-color: {theme_config["info"]} !important;
-    color: {text_color} !important;
+    color: {theme_config["fg"]} !important;
+    font-weight: 500 !important;
 }}
 
 .alert-warning {{
-    background: {theme_config["warning"]}20 !important;
+    background: {theme_config["warning"]}30 !important;
     border-left-color: {theme_config["warning"]} !important;
-    color: {text_color} !important;
+    color: {theme_config["fg"]} !important;
+    font-weight: 500 !important;
 }}
 
 .alert-danger {{
-    background: {theme_config["danger"]}20 !important;
+    background: {theme_config["danger"]}30 !important;
     border-left-color: {theme_config["danger"]} !important;
-    color: {text_color} !important;
+    color: {theme_config["fg"]} !important;
+    font-weight: 500 !important;
 }}
 
-/* Grid Layout - Compact */
+/* Grid Layout - Compact & Responsive */
 .btn-grid {{
     display: grid !important;
     grid-template-columns: repeat(6, 1fr) !important;
     gap: 8px !important;
     margin: 15px 0 !important;
+}}
+
+/* Mobile responsive - 3 columns on small screens */
+@media (max-width: 768px) {{
+    .btn-grid {{
+        grid-template-columns: repeat(3, 1fr) !important;
+    }}
 }}
 
 .control-grid {{
@@ -1180,8 +1196,15 @@ def create_app():
         daemon_running, pid = is_daemon_running()
         
         if daemon_running:
-            # Stop the daemon - put robot to sleep first
+            # Stop the daemon - stop any playback first, then put robot to sleep
             try:
+                # If robot is currently playing, stop it first
+                if app_state.can_stop():
+                    print("[DAEMON] Stopping current playback before daemon shutdown...")
+                    motion_engine.stop_playback()
+                    app_state.stop_playing()
+                    time.sleep(0.5)  # Give time for playback to stop
+                
                 # Connect to robot and perform sleep sequence
                 if SDK_AVAILABLE:
                     try:
@@ -1238,14 +1261,24 @@ def create_app():
         
         # Main Header with Settings
         with gr.Row(elem_classes=["compact-header"]):
-            with gr.Column(scale=3):
+            with gr.Column(scale=2):
                 gr.HTML('<h2>🧪 Reachy Mini Lab</h2>')
                 gr.HTML('<p style="font-size: 0.9em; margin: 0; opacity: 0.9;">Create your own movement patterns</p>')
             with gr.Column(scale=1):
-                settings_toggle_btn = gr.Button("⚙️ Settings", size="sm", variant="secondary")
+                settings_toggle_btn = gr.Button("⚙️ Show Settings", size="sm", variant="secondary")
         
         # Settings Panel (collapsible)
         with gr.Row(elem_classes=["compact-header"], visible=False) as settings_panel:
+            with gr.Column(scale=1):
+                # App Selector
+                app_selector = gr.Dropdown(
+                    choices=["🧪 Reachy Mini Lab", "🎤 Karaoke Duet", "🎵 Music Reactive", "🎭 Duet Stage"],
+                    value="🧪 Reachy Mini Lab",
+                    label="📱 Select App",
+                    interactive=True,
+                    container=False
+                )
+                gr.HTML('<div style="font-size: 0.75em; opacity: 0.9; padding: 3px; color: white;">Switch between Reachy apps</div>')
             with gr.Column(scale=2):
                 # Daemon Control
                 initial_btn_text, initial_status = get_daemon_status()
@@ -1320,12 +1353,13 @@ def create_app():
         # Settings toggle
         def toggle_settings(visible):
             new_visible = not visible
-            return gr.update(visible=new_visible), new_visible
+            button_text = "⚙️ Hide Settings" if new_visible else "⚙️ Show Settings"
+            return gr.update(visible=new_visible), new_visible, gr.update(value=button_text)
         
         settings_toggle_btn.click(
             fn=toggle_settings, 
             inputs=[settings_visible], 
-            outputs=[settings_panel, settings_visible]
+            outputs=[settings_panel, settings_visible, settings_toggle_btn]
         )
         
         # Daemon control
