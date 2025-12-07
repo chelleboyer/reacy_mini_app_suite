@@ -1390,19 +1390,61 @@ if __name__ == "__main__":
     controller = None
     
     if SDK_AVAILABLE:
-        print("Reachy SDK available - attempting connection...")
+        print("Reachy SDK available - checking for daemon...")
+        
+        # Check if daemon is running
+        import subprocess
+        daemon_running = False
         try:
-            # Try to connect to robot (will fail gracefully if not available)
-            robot = ReachyWrapper(media_backend="no_media")
-            robot.connect()
-            robot.wake_up()
-            controller = SafeMotionController()
-            print("✅ Robot connected!")
+            result = subprocess.run(
+                ["systemctl", "is-active", "reachy_mini_daemon"],
+                capture_output=True,
+                text=True,
+                timeout=2
+            )
+            daemon_running = (result.returncode == 0 and result.stdout.strip() == "active")
         except Exception as e:
-            print(f"⚠️  Robot not available: {e}")
-            print("Running in DEMO mode")
-            robot = None
-            controller = None
+            print(f"Could not check daemon status: {e}")
+        
+        if not daemon_running:
+            print("⚠️  Reachy daemon not running - attempting to start...")
+            try:
+                # Try to start the daemon
+                start_result = subprocess.run(
+                    ["sudo", "systemctl", "start", "reachy_mini_daemon"],
+                    capture_output=True,
+                    text=True,
+                    timeout=5
+                )
+                if start_result.returncode == 0:
+                    print("✅ Daemon started successfully")
+                    # Wait a moment for daemon to initialize
+                    import time
+                    time.sleep(2)
+                    daemon_running = True
+                else:
+                    print(f"⚠️  Could not start daemon: {start_result.stderr}")
+            except Exception as e:
+                print(f"⚠️  Failed to start daemon: {e}")
+        else:
+            print("✅ Daemon is running")
+        
+        if daemon_running:
+            print("Attempting connection to robot...")
+            try:
+                # Try to connect to robot (will fail gracefully if not available)
+                robot = ReachyWrapper(media_backend="no_media")
+                robot.connect()
+                robot.wake_up()
+                controller = SafeMotionController()
+                print("✅ Robot connected!")
+            except Exception as e:
+                print(f"⚠️  Robot not available: {e}")
+                print("Running in DEMO mode")
+                robot = None
+                controller = None
+        else:
+            print("⚠️  Daemon not available - running in DEMO mode")
     else:
         print("Running in DEMO mode (SDK not installed)")
     
