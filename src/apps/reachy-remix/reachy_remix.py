@@ -221,40 +221,80 @@ def get_custom_css(theme_name="minty"):
 }}
 
 .gradio-container {{
-    background: {theme_config["bg"]} !important;
+    background: 
+        radial-gradient(circle at 20% 50%, {theme_config["primary"]}15 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, {theme_config["info"]}15 0%, transparent 50%),
+        radial-gradient(circle at 40% 20%, {theme_config["success"]}10 0%, transparent 50%),
+        linear-gradient(135deg, {theme_config["bg"]} 0%, {theme_config["secondary"]}15 100%) !important;
     color: {text_color} !important;
     padding: 0 !important;
+    min-height: 100vh !important;
+    position: relative !important;
+}}
+
+.gradio-container::before {{
+    content: '' !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: 
+        repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 60px,
+            {theme_config["primary"]}05 60px,
+            {theme_config["primary"]}05 61px
+        ) !important;
+    pointer-events: none !important;
+    z-index: 0 !important;
+}}
+
+.gradio-container > * {{
+    position: relative !important;
+    z-index: 1 !important;
 }}
 
 /* Compact Header */
 .compact-header {{
-    background: {theme_config["primary"]} !important;
-    padding: 15px 25px !important;
-    border-bottom: 2px solid {theme_config["info"]} !important;
+    background: linear-gradient(90deg, {theme_config["primary"]} 0%, {theme_config["info"]} 100%) !important;
+    padding: 10px 20px !important;
+    border-bottom: 3px solid {theme_config["success"]} !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
 }}
 
 .compact-header h2 {{
     margin: 0 !important;
-    font-size: 1.8em !important;
+    font-size: 1.3em !important;
     font-weight: 700 !important;
     color: white !important;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2) !important;
 }}
 
 /* Compact Container */
 .compact-container {{
     max-width: 1200px !important;
     margin: 0 auto !important;
-    padding: 15px !important;
+    padding: 20px !important;
+    background: {card_bg}dd !important;
+    backdrop-filter: blur(10px) !important;
+    border-radius: 15px !important;
+    margin-top: 15px !important;
+    margin-bottom: 15px !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+    border: 1px solid {theme_config["primary"]}30 !important;
 }}
 
 /* Sequence Display - Compact */
 #sequence-card {{
-    background: {card_bg} !important;
-    border: 1px solid {theme_config["primary"]}60 !important;
-    border-radius: 6px !important;
+    background: linear-gradient(135deg, {card_bg} 0%, {theme_config["primary"]}10 100%) !important;
+    border: 2px solid {theme_config["primary"]}80 !important;
+    border-radius: 10px !important;
     padding: 20px !important;
     margin: 15px 0 !important;
     min-height: 100px !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
 }}
 
 /* Move Buttons - Compact with clear emojis */
@@ -263,23 +303,23 @@ button {{
 }}
 
 .move-btn {{
-    background: {theme_config["primary"]} !important;
-    border: 1px solid {theme_config["primary"]} !important;
-    border-radius: 5px !important;
+    background: linear-gradient(135deg, {theme_config["primary"]} 0%, {theme_config["info"]} 100%) !important;
+    border: 2px solid {theme_config["primary"]}cc !important;
+    border-radius: 8px !important;
     padding: 12px 20px !important;
     font-size: 1rem !important;
     font-weight: 600 !important;
     color: white !important;
-    transition: all 0.15s ease !important;
+    transition: all 0.2s ease !important;
     min-height: 50px !important;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12) !important;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15) !important;
 }}
 
 .move-btn:hover {{
-    background: {theme_config["info"]} !important;
-    border-color: {theme_config["info"]} !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
+    background: linear-gradient(135deg, {theme_config["info"]} 0%, {theme_config["success"]} 100%) !important;
+    border-color: {theme_config["success"]} !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2) !important;
 }}
 
 .move-btn:active {{
@@ -288,34 +328,46 @@ button {{
 
 /* Control Buttons - Bootstrap size */
 .btn-success {{
-    background: {theme_config["success"]} !important;
-    border: 1px solid {theme_config["success"]} !important;
+    background: linear-gradient(135deg, {theme_config["success"]} 0%, {theme_config["info"]} 100%) !important;
+    border: 2px solid {theme_config["success"]} !important;
     color: white !important;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15) !important;
+    transition: all 0.2s ease !important;
 }}
 
 .btn-success:hover {{
-    background: {theme_config["info"]} !important;
+    background: linear-gradient(135deg, {theme_config["info"]} 0%, {theme_config["success"]} 100%) !important;
     border-color: {theme_config["info"]} !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2) !important;
 }}
 
 .btn-warning {{
-    background: {theme_config["warning"]} !important;
-    border: 1px solid {theme_config["warning"]} !important;
+    background: linear-gradient(135deg, {theme_config["warning"]} 0%, {theme_config["primary"]} 100%) !important;
+    border: 2px solid {theme_config["warning"]} !important;
     color: white !important;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15) !important;
+    transition: all 0.2s ease !important;
 }}
 
 .btn-warning:hover {{
-    background: {theme_config["primary"]} !important;
+    background: linear-gradient(135deg, {theme_config["primary"]} 0%, {theme_config["warning"]} 100%) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2) !important;
 }}
 
 .btn-danger {{
-    background: {theme_config["danger"]} !important;
-    border: 1px solid {theme_config["danger"]} !important;
+    background: linear-gradient(135deg, {theme_config["danger"]} 0%, {theme_config["secondary"]} 100%) !important;
+    border: 2px solid {theme_config["danger"]} !important;
     color: white !important;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15) !important;
+    transition: all 0.2s ease !important;
 }}
 
 .btn-danger:hover {{
-    background: {theme_config["secondary"]} !important;
+    background: linear-gradient(135deg, {theme_config["secondary"]} 0%, {theme_config["danger"]} 100%) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2) !important;
 }}
 
 /* Status Alert - Bootstrap compact */
@@ -992,25 +1044,46 @@ def create_app():
         )
     
     def on_theme_change(theme_name):
-        """Handle theme change - requires app reload."""
+        """Handle theme change - updates CSS instantly via JavaScript."""
         global current_theme_name, theme, custom_css
         current_theme_name = theme_name
         theme = create_theme(theme_name)
-        custom_css = get_custom_css(theme_name)
+        new_css = get_custom_css(theme_name)
         
         theme_display = TTKBOOTSTRAP_THEMES[theme_name]["name"]
-        return gr.update(value=f"""
-        <div style="padding: 15px; background: {TTKBOOTSTRAP_THEMES[theme_name]['primary']}; 
-                    border-radius: 10px; color: white; text-align: center;">
-            <strong>🎨 Theme changed to {theme_display}!</strong><br/>
-            <span style="font-size: 0.9em;">Refresh the page to see the new theme applied.</span>
-        </div>
-        """)
+        # Escape quotes and newlines for JavaScript
+        escaped_css = new_css.replace('\\', '\\\\').replace("'", "\\'").replace('\n', ' ')
+        
+        # Return JavaScript to update CSS and confirmation message
+        return (
+            gr.update(value=f"""
+            <script>
+            (function() {{
+                // Remove old custom style
+                var oldStyle = document.getElementById('custom-theme-style');
+                if (oldStyle) oldStyle.remove();
+                
+                // Inject new custom style
+                var style = document.createElement('style');
+                style.id = 'custom-theme-style';
+                style.textContent = `{escaped_css}`;
+                document.head.appendChild(style);
+                console.log('Theme updated to {theme_name}');
+            }})();
+            </script>
+            """),
+            gr.update(value=f"""
+            <div style="padding: 10px 15px; background: linear-gradient(90deg, {TTKBOOTSTRAP_THEMES[theme_name]['primary']} 0%, {TTKBOOTSTRAP_THEMES[theme_name]['info']} 100%); 
+                        border-radius: 6px; color: white; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
+                <strong>✨ Theme: {theme_display}</strong>
+            </div>
+            """)
+        )
     
     with gr.Blocks(title="🎵 Reachy Remix") as app:
         
-        # Inject custom CSS
-        gr.HTML(f"<style>{custom_css}</style>")
+        # Inject custom CSS (will be updated dynamically via JavaScript)
+        css_element = gr.HTML(f"<style id='custom-theme-style'>{custom_css}</style>")
         
         # Compact Header
         with gr.Row(elem_classes=["compact-header"]):
@@ -1021,10 +1094,11 @@ def create_app():
                     choices=list(TTKBOOTSTRAP_THEMES.keys()),
                     value=current_theme_name,
                     label="🎨 Theme",
-                    interactive=True
+                    interactive=True,
+                    container=False
                 )
                 theme_info = gr.HTML(
-                    f'<div style="font-size: 0.85em; opacity: 0.8; padding: 5px;">Current: <strong>{TTKBOOTSTRAP_THEMES[current_theme_name]["name"]}</strong></div>'
+                    f'<div style="font-size: 0.75em; opacity: 0.9; padding: 3px; color: white;">Current: <strong>{TTKBOOTSTRAP_THEMES[current_theme_name]["name"]}</strong></div>'
                 )
         
         # Main container
@@ -1063,8 +1137,8 @@ def create_app():
         # EVENT HANDLERS
         # ========================================
         
-        # Theme selector
-        theme_selector.change(fn=on_theme_change, inputs=[theme_selector], outputs=[theme_info])
+        # Theme selector - updates CSS instantly
+        theme_selector.change(fn=on_theme_change, inputs=[theme_selector], outputs=[css_element, theme_info])
         
         # Move button clicks
         btn_nod.click(fn=lambda: on_move_click("nod_yes"), outputs=[sequence_display, status_display, btn_undo])
