@@ -31,12 +31,14 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 try:
     from src.common.reachy.robot_wrapper import ReachyWrapper
     from src.common.reachy.safe_motions import SafeMotionController
+    from reachy_mini.motion.recorded_move import RecordedMoves
     SDK_AVAILABLE = True
 except ImportError:
     print("⚠️  Reachy SDK not available - running in demo mode")
     SDK_AVAILABLE = False
     ReachyWrapper = None
     SafeMotionController = None
+    RecordedMoves = None
 
 
 # ============================================================
@@ -486,7 +488,7 @@ class MotionEngine:
     """Core motion execution engine - UI-agnostic.
     
     Executes individual moves and full sequences via Reachy SDK.
-    Designed to be extensible for future voice/vision inputs.
+    Uses SDK recorded moves from the dance library.
     """
     
     def __init__(self, robot=None, controller=None):
@@ -501,184 +503,39 @@ class MotionEngine:
         self.demo_mode = (robot is None)
         self.should_stop = False  # Flag for stopping playback
         
-        # Move registry - maps move IDs to execution functions
-        self.MOVE_REGISTRY = {
-            "nod_yes": self._move_nod_yes,
-            "shake_no": self._move_shake_no,
-            "wave": self._move_wave,
-            "happy": self._move_happy,
-            "excited": self._move_excited,
-            "look_around": self._move_look_around,
-            # Small moves (basic implementations)
-            "spin": self._move_spin,
-            "bow": self._move_bow,
-            "shrug": self._move_shrug,
-            "think": self._move_think,
-            "celebrate": self._move_celebrate,
-            "sleep": self._move_sleep,
-            "dance": self._move_dance,
-            "robot": self._move_robot,
-            "star": self._move_star,
-            "heart": self._move_heart,
-            "cool": self._move_cool,
-            "surprise": self._move_surprise,
-        }
-    
-    def _move_nod_yes(self):
-        """Execute nod yes gesture."""
-        if self.demo_mode:
-            print("  [DEMO] 👍 Nod Yes")
-            time.sleep(1.5)
-        else:
-            self.controller.nod_yes(self.robot, count=2, speed=1.5)
-    
-    def _move_shake_no(self):
-        """Execute shake no gesture."""
-        if self.demo_mode:
-            print("  [DEMO] 👎 Shake No")
-            time.sleep(1.5)
-        else:
-            self.controller.shake_no(self.robot, count=2, speed=1.5)
-    
-    def _move_wave(self):
-        """Execute wave antennas gesture."""
-        if self.demo_mode:
-            print("  [DEMO] 👋 Wave")
-            time.sleep(2.0)
-        else:
-            self.controller.wave_antennas(self.robot, count=2, synchronized=True)
-    
-    def _move_happy(self):
-        """Execute happy expression."""
-        if self.demo_mode:
-            print("  [DEMO] 😊 Happy")
-            time.sleep(1.5)
-        else:
-            self.controller.express_happy(self.robot)
-    
-    def _move_excited(self):
-        """Execute excited expression."""
-        if self.demo_mode:
-            print("  [DEMO] 🎉 Excited")
-            time.sleep(1.5)
-        else:
-            self.controller.express_excited(self.robot)
-    
-    def _move_look_around(self):
-        """Execute look around gesture."""
-        if self.demo_mode:
-            print("  [DEMO] 👀 Look Around")
-            time.sleep(2.0)
-        else:
-            self.controller.look_around(self.robot, speed=1.0)
-    
-    # Extended library moves (small moves)
-    def _move_spin(self):
-        """Execute spin gesture."""
-        if self.demo_mode:
-            print("  [DEMO] 🌀 Spin")
-            time.sleep(1.5)
-        else:
-            self.controller.nod_yes(self.robot, count=3, speed=2.0)  # Placeholder
-    
-    def _move_bow(self):
-        """Execute bow gesture."""
-        if self.demo_mode:
-            print("  [DEMO] 🙇 Bow")
-            time.sleep(1.5)
-        else:
-            self.controller.nod_yes(self.robot, count=1, speed=0.8)
-    
-    def _move_shrug(self):
-        """Execute shrug gesture."""
-        if self.demo_mode:
-            print("  [DEMO] 🤷 Shrug")
-            time.sleep(1.5)
-        else:
-            self.controller.wave_antennas(self.robot, count=1, synchronized=False)
-    
-    def _move_think(self):
-        """Execute thinking gesture."""
-        if self.demo_mode:
-            print("  [DEMO] 🤔 Think")
-            time.sleep(1.5)
-        else:
-            self.controller.look_around(self.robot, speed=0.5)
-    
-    def _move_celebrate(self):
-        """Execute celebration gesture."""
-        if self.demo_mode:
-            print("  [DEMO] 🙌 Celebrate")
-            time.sleep(1.5)
-        else:
-            self.controller.express_excited(self.robot)
-    
-    def _move_sleep(self):
-        """Execute sleep gesture."""
-        if self.demo_mode:
-            print("  [DEMO] 😴 Sleep")
-            time.sleep(2.0)
-        else:
-            self.controller.nod_yes(self.robot, count=1, speed=0.5)
-    
-    def _move_dance(self):
-        """Execute dance gesture."""
-        if self.demo_mode:
-            print("  [DEMO] 💃 Dance")
-            time.sleep(1.5)
-        else:
-            self.controller.wave_antennas(self.robot, count=2, synchronized=True)
-    
-    def _move_robot(self):
-        """Execute robot pose."""
-        if self.demo_mode:
-            print("  [DEMO] 🤖 Robot Pose")
-            time.sleep(1.5)
-        else:
-            self.controller.express_happy(self.robot)
-    
-    def _move_star(self):
-        """Execute star pose."""
-        if self.demo_mode:
-            print("  [DEMO] ⭐ Star Pose")
-            time.sleep(1.5)
-        else:
-            self.controller.express_excited(self.robot)
-    
-    def _move_heart(self):
-        """Execute love gesture."""
-        if self.demo_mode:
-            print("  [DEMO] ❤️ Love")
-            time.sleep(1.5)
-        else:
-            self.controller.express_happy(self.robot)
-    
-    def _move_cool(self):
-        """Execute cool gesture."""
-        if self.demo_mode:
-            print("  [DEMO] 😎 Cool")
-            time.sleep(1.5)
-        else:
-            self.controller.express_happy(self.robot)
-    
-    def _move_surprise(self):
-        """Execute surprise gesture."""
-        if self.demo_mode:
-            print("  [DEMO] 😲 Surprise")
-            time.sleep(1.5)
-        else:
-            self.controller.express_excited(self.robot)
+        # Load SDK recorded moves library
+        self.recorded_moves = None
+        if not self.demo_mode and SDK_AVAILABLE:
+            try:
+                self.recorded_moves = RecordedMoves("pollen-robotics/reachy-mini-dances-library")
+                print(f"✅ Loaded {len(self.recorded_moves.list_moves())} dance moves from SDK")
+            except Exception as e:
+                print(f"⚠️  Could not load recorded moves: {e}")
+                self.recorded_moves = None
+
     
     def stop_playback(self):
-        """Request to stop current playback."""
+        """Request to stop current playback immediately."""
         self.should_stop = True
         print("[STOP] Stop signal sent to motion engine")
+        
+        # Immediately stop the robot by setting compliant mode
+        if not self.demo_mode and self.robot:
+            try:
+                print("[STOP] Setting robot to compliant mode...")
+                self.robot._robot.set_compliant(True)
+                time.sleep(0.2)
+                # Wake back up for next sequence
+                self.robot._robot.set_compliant(False)
+                print("[STOP] Robot stopped")
+            except Exception as e:
+                print(f"[STOP] Error stopping robot: {e}")
     
     def execute_move(self, move_id: str) -> bool:
-        """Execute a single move.
+        """Execute a single move using SDK recorded moves.
         
         Args:
-            move_id: Move identifier from MOVE_REGISTRY
+            move_id: Move identifier (SDK dance move name)
             
         Returns:
             True if successful, False otherwise
@@ -686,12 +543,37 @@ class MotionEngine:
         Raises:
             Exception: Propagates exceptions from move execution for error handling
         """
-        if move_id not in self.MOVE_REGISTRY:
-            raise ValueError(f"Unknown move: {move_id}")
+        if self.demo_mode:
+            print(f"  [DEMO] {move_id}")
+            # Check for stop during demo sleep (allows interrupt in demo mode)
+            for _ in range(15):  # 15 x 0.1s = 1.5s
+                if self.should_stop:
+                    print("  [DEMO] Move interrupted")
+                    return False
+                time.sleep(0.1)
+            return True
         
-        move_func = self.MOVE_REGISTRY[move_id]
-        move_func()
-        return True
+        if not self.recorded_moves:
+            print(f"  [ERROR] Recorded moves not loaded")
+            return False
+            
+        try:
+            # Check if stopped before starting move
+            if self.should_stop:
+                return False
+                
+            move = self.recorded_moves.get(move_id)
+            # Access the underlying ReachyMini object from ReachyWrapper
+            self.robot._robot.play_move(move, initial_goto_duration=1.0)
+            
+            # Check if stopped after move completes
+            if self.should_stop:
+                return False
+                
+            return True
+        except Exception as e:
+            print(f"  [ERROR] Failed to execute {move_id}: {e}")
+            return False
     
     def get_micro_feedback(self, move_id: str):
         """Provide subtle acknowledgment after move completion.
@@ -740,9 +622,9 @@ class MotionEngine:
         
         try:
             for i, move_id in enumerate(sequence):
-                # Check for stop signal
+                # Check for stop signal BEFORE starting move
                 if self.should_stop:
-                    print(f"  [STOP] Playback stopped at move {i+1}/{len(sequence)}")
+                    print(f"  [STOP] Playback stopped before move {i+1}/{len(sequence)}")
                     yield i, ExecutionResult(
                         success=False,
                         moves_completed=moves_completed,
@@ -758,11 +640,22 @@ class MotionEngine:
                 # Execute move (catching exceptions to provide detailed error messages)
                 try:
                     success = self.execute_move(move_id)
+                    
+                    # Check for stop signal AFTER move completes
+                    if self.should_stop:
+                        print(f"  [STOP] Playback stopped after move {i+1}/{len(sequence)}")
+                        yield i, ExecutionResult(
+                            success=False,
+                            moves_completed=moves_completed + 1,
+                            error_message="Playback stopped by user"
+                        )
+                        return
+                    
                     if not success:
                         yield i, ExecutionResult(
                             success=False,
                             moves_completed=moves_completed,
-                            error_message=f"Move '{move_id}' failed"
+                            error_message=f"Move '{move_id}' failed or stopped"
                         )
                         return
                 except Exception as move_error:
@@ -883,29 +776,29 @@ class SequenceBuilder:
     Manages the move sequence and converts to emoji display format.
     """
     
-    # Move definitions with size categories (per Robot Dance Studio PRD)
+    # Move definitions with actual SDK dance names
     MOVE_DEFINITIONS = [
         # Large primary moves (main grid)
-        {"id": "nod_yes", "label": "Nod Yes", "emoji": "👍", "size": "large", "category": "gesture"},
-        {"id": "shake_no", "label": "Shake No", "emoji": "👎", "size": "large", "category": "gesture"},
-        {"id": "wave", "label": "Wave", "emoji": "👋", "size": "large", "category": "gesture"},
-        {"id": "look_around", "label": "Look Around", "emoji": "👀", "size": "large", "category": "gesture"},
-        {"id": "happy", "label": "Happy", "emoji": "😊", "size": "large", "category": "emotion"},
-        {"id": "excited", "label": "Excited", "emoji": "🎉", "size": "large", "category": "emotion"},
+        {"id": "simple_nod", "label": "Simple Nod", "emoji": "👍", "size": "large", "category": "gesture"},
+        {"id": "yeah_nod", "label": "Yeah Nod", "emoji": "😄", "size": "large", "category": "gesture"},
+        {"id": "uh_huh_tilt", "label": "Uh Huh Tilt", "emoji": "👋", "size": "large", "category": "gesture"},
+        {"id": "side_glance_flick", "label": "Side Glance", "emoji": "👀", "size": "large", "category": "gesture"},
+        {"id": "groovy_sway_and_roll", "label": "Groovy Sway", "emoji": "😊", "size": "large", "category": "dance"},
+        {"id": "side_to_side_sway", "label": "Side Sway", "emoji": "🎉", "size": "large", "category": "dance"},
         
         # Small secondary moves (extended library)
-        {"id": "spin", "label": "Spin", "emoji": "🌀", "size": "small", "category": "dance"},
-        {"id": "bow", "label": "Bow", "emoji": "🙇", "size": "small", "category": "gesture"},
-        {"id": "shrug", "label": "Shrug", "emoji": "🤷", "size": "small", "category": "gesture"},
-        {"id": "think", "label": "Think", "emoji": "🤔", "size": "small", "category": "emotion"},
-        {"id": "celebrate", "label": "Celebrate", "emoji": "🙌", "size": "small", "category": "emotion"},
-        {"id": "sleep", "label": "Sleep", "emoji": "😴", "size": "small", "category": "emotion"},
-        {"id": "dance", "label": "Dance", "emoji": "💃", "size": "small", "category": "dance"},
-        {"id": "robot", "label": "Robot Pose", "emoji": "🤖", "size": "small", "category": "dance"},
-        {"id": "star", "label": "Star Pose", "emoji": "⭐", "size": "small", "category": "dance"},
-        {"id": "heart", "label": "Love", "emoji": "❤️", "size": "small", "category": "emotion"},
-        {"id": "cool", "label": "Cool", "emoji": "😎", "size": "small", "category": "emotion"},
-        {"id": "surprise", "label": "Surprise", "emoji": "😲", "size": "small", "category": "emotion"},
+        {"id": "dizzy_spin", "label": "Dizzy Spin", "emoji": "🌀", "size": "small", "category": "dance"},
+        {"id": "chicken_peck", "label": "Chicken Peck", "emoji": "🐔", "size": "small", "category": "gesture"},
+        {"id": "sharp_side_tilt", "label": "Sharp Tilt", "emoji": "⚡", "size": "small", "category": "gesture"},
+        {"id": "head_tilt_roll", "label": "Head Roll", "emoji": "🔄", "size": "small", "category": "gesture"},
+        {"id": "pendulum_swing", "label": "Pendulum", "emoji": "⏱️", "size": "small", "category": "dance"},
+        {"id": "neck_recoil", "label": "Neck Recoil", "emoji": "😲", "size": "small", "category": "gesture"},
+        {"id": "jackson_square", "label": "Jackson Square", "emoji": "💃", "size": "small", "category": "dance"},
+        {"id": "grid_snap", "label": "Grid Snap", "emoji": "📐", "size": "small", "category": "dance"},
+        {"id": "chin_lead", "label": "Chin Lead", "emoji": "⭐", "size": "small", "category": "gesture"},
+        {"id": "side_peekaboo", "label": "Peekaboo", "emoji": "👻", "size": "small", "category": "gesture"},
+        {"id": "headbanger_combo", "label": "Headbanger", "emoji": "🎸", "size": "small", "category": "dance"},
+        {"id": "stumble_and_recover", "label": "Stumble", "emoji": "😵", "size": "small", "category": "dance"},
     ]
     
     # Emoji mapping for moves
@@ -971,15 +864,8 @@ class SequenceBuilder:
             </div>
             '''
         
-        # Map for display names
-        move_names = {
-            "nod_yes": "Nod Yes",
-            "shake_no": "Shake No",
-            "wave": "Wave",
-            "look_around": "Look Around",
-            "happy": "Happy",
-            "excited": "Excited"
-        }
+        # Map for display names (using actual SDK names)
+        move_names = {move["id"]: move["label"] for move in self.MOVE_DEFINITIONS}
         
         # Create compact emoji row with smart sizing
         emojis = [self.EMOJI_MAP.get(move, "❓") for move in self.moves]
@@ -1252,10 +1138,81 @@ def create_app():
             gr.update(value=f'<div style="font-size: 0.75em; opacity: 0.9; padding: 3px; color: white;">Current: <strong>{theme_display}</strong></div>')
         )
     
+    # Daemon control helpers
+    def is_daemon_running() -> tuple[bool, int | None]:
+        """Check if reachy-mini-daemon is running."""
+        import psutil
+        for proc in psutil.process_iter(["pid", "name", "cmdline"]):
+            try:
+                cmdline = proc.info.get("cmdline") or []
+                for cmd in cmdline:
+                    if "reachy-mini-daemon" in cmd:
+                        return True, proc.pid
+            except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+                continue
+        return False, None
+    
+    def get_daemon_status():
+        """Get current daemon status for UI initialization."""
+        daemon_running, pid = is_daemon_running()
+        if daemon_running:
+            return "⏹️ Stop Daemon", f'<div class="alert alert-success">✅ Daemon running (PID: {pid})</div>'
+        else:
+            return "🚀 Start Daemon", '<div class="alert alert-warning">⚠️ Daemon not running</div>'
+    
+    def on_daemon_toggle():
+        """Toggle daemon on/off."""
+        import subprocess
+        import time
+        import os
+        
+        daemon_running, pid = is_daemon_running()
+        
+        if daemon_running:
+            # Stop the daemon
+            try:
+                os.kill(pid, 9)
+                time.sleep(0.5)
+                status = '<div class="alert alert-warning">⏹️ Daemon stopped</div>'
+                button_text = "🚀 Start Daemon"
+                print(f"[DAEMON] Stopped daemon (PID: {pid})")
+            except Exception as e:
+                status = f'<div class="alert alert-danger">❌ Failed to stop: {e}</div>'
+                button_text = "⏹️ Stop Daemon"
+        else:
+            # Start the daemon
+            try:
+                subprocess.Popen(
+                    ["reachy-mini-daemon"],
+                    start_new_session=True,
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL
+                )
+                time.sleep(2)
+                daemon_running, pid = is_daemon_running()
+                if daemon_running:
+                    status = f'<div class="alert alert-success">✅ Daemon started (PID: {pid})</div>'
+                    button_text = "⏹️ Stop Daemon"
+                    print(f"[DAEMON] Started daemon (PID: {pid})")
+                else:
+                    status = '<div class="alert alert-danger">❌ Failed to start daemon</div>'
+                    button_text = "🚀 Start Daemon"
+            except Exception as e:
+                status = f'<div class="alert alert-danger">❌ Failed to start: {e}</div>'
+                button_text = "🚀 Start Daemon"
+        
+        return button_text, status
+    
     with gr.Blocks(title="🎵 Reachy Remix") as app:
         
         # Inject custom CSS
         css_element = gr.HTML(f"<style id='custom-theme-style'>{custom_css}</style>")
+        
+        # Daemon Control Bar
+        initial_btn_text, initial_status = get_daemon_status()
+        with gr.Row(elem_classes=["compact-header"]):
+            daemon_status = gr.HTML(initial_status)
+            daemon_toggle_btn = gr.Button(initial_btn_text, size="sm", scale=1)
         
         # Compact Header with App Mode Selector
         with gr.Row(elem_classes=["compact-header"]):
@@ -1314,26 +1271,26 @@ def create_app():
             # Primary Move Buttons (Large) - 6 wide x 3 high
             gr.HTML('<div class="section-title">🎨 Primary Moves</div>')
             with gr.Row(elem_classes=["btn-grid"]):
-                btn_nod = gr.Button(value="👍 Nod Yes", elem_classes=["move-btn"], size="lg")
-                btn_shake = gr.Button(value="👎 Shake No", elem_classes=["move-btn"], size="lg")
-                btn_wave = gr.Button(value="👋 Wave", elem_classes=["move-btn"], size="lg")
-                btn_look = gr.Button(value="👀 Look", elem_classes=["move-btn"], size="lg")
-                btn_happy = gr.Button(value="😊 Happy", elem_classes=["move-btn"], size="lg")
-                btn_excited = gr.Button(value="🎉 Excited", elem_classes=["move-btn"], size="lg")
+                btn_nod = gr.Button(value="👍 Simple Nod", elem_classes=["move-btn"], size="lg")
+                btn_shake = gr.Button(value="😄 Yeah Nod", elem_classes=["move-btn"], size="lg")
+                btn_wave = gr.Button(value="👋 Uh Huh Tilt", elem_classes=["move-btn"], size="lg")
+                btn_look = gr.Button(value="👀 Side Glance", elem_classes=["move-btn"], size="lg")
+                btn_happy = gr.Button(value="😊 Groovy Sway", elem_classes=["move-btn"], size="lg")
+                btn_excited = gr.Button(value="🎉 Side Sway", elem_classes=["move-btn"], size="lg")
             with gr.Row(elem_classes=["btn-grid"]):
-                btn_spin = gr.Button(value="🌀 Spin", elem_classes=["move-btn"], size="lg")
-                btn_bow = gr.Button(value="🙇 Bow", elem_classes=["move-btn"], size="lg")
-                btn_shrug = gr.Button(value="🤷 Shrug", elem_classes=["move-btn"], size="lg")
-                btn_think = gr.Button(value="🤔 Think", elem_classes=["move-btn"], size="lg")
-                btn_celebrate = gr.Button(value="🙌 Celebrate", elem_classes=["move-btn"], size="lg")
-                btn_sleep = gr.Button(value="😴 Sleep", elem_classes=["move-btn"], size="lg")
+                btn_spin = gr.Button(value="🌀 Dizzy Spin", elem_classes=["move-btn"], size="lg")
+                btn_bow = gr.Button(value="🐔 Chicken Peck", elem_classes=["move-btn"], size="lg")
+                btn_shrug = gr.Button(value="⚡ Sharp Tilt", elem_classes=["move-btn"], size="lg")
+                btn_think = gr.Button(value="🔄 Head Roll", elem_classes=["move-btn"], size="lg")
+                btn_celebrate = gr.Button(value="⏱️ Pendulum", elem_classes=["move-btn"], size="lg")
+                btn_sleep = gr.Button(value="😲 Neck Recoil", elem_classes=["move-btn"], size="lg")
             with gr.Row(elem_classes=["btn-grid"]):
-                btn_dance = gr.Button(value="💃 Dance", elem_classes=["move-btn"], size="lg")
-                btn_robot = gr.Button(value="🤖 Robot", elem_classes=["move-btn"], size="lg")
-                btn_star = gr.Button(value="⭐ Star", elem_classes=["move-btn"], size="lg")
-                btn_heart = gr.Button(value="❤️ Love", elem_classes=["move-btn"], size="lg")
-                btn_cool = gr.Button(value="😎 Cool", elem_classes=["move-btn"], size="lg")
-                btn_surprise = gr.Button(value="😲 Surprise", elem_classes=["move-btn"], size="lg")
+                btn_dance = gr.Button(value="💃 Jackson Square", elem_classes=["move-btn"], size="lg")
+                btn_robot = gr.Button(value="📐 Grid Snap", elem_classes=["move-btn"], size="lg")
+                btn_star = gr.Button(value="⭐ Chin Lead", elem_classes=["move-btn"], size="lg")
+                btn_heart = gr.Button(value="👻 Peekaboo", elem_classes=["move-btn"], size="lg")
+                btn_cool = gr.Button(value="🎸 Headbanger", elem_classes=["move-btn"], size="lg")
+                btn_surprise = gr.Button(value="😵 Stumble", elem_classes=["move-btn"], size="lg")
             
 
 
@@ -1342,30 +1299,33 @@ def create_app():
         # EVENT HANDLERS
         # ========================================
         
+        # Daemon control
+        daemon_toggle_btn.click(fn=on_daemon_toggle, outputs=[daemon_toggle_btn, daemon_status])
+        
         # Theme selector - updates CSS instantly
         theme_selector.change(fn=on_theme_change, inputs=[theme_selector], outputs=[css_element, theme_info])
         
-        # Primary move button clicks
-        btn_nod.click(fn=lambda: on_move_click("nod_yes"), outputs=[sequence_display, status_display, btn_undo])
-        btn_shake.click(fn=lambda: on_move_click("shake_no"), outputs=[sequence_display, status_display, btn_undo])
-        btn_wave.click(fn=lambda: on_move_click("wave"), outputs=[sequence_display, status_display, btn_undo])
-        btn_look.click(fn=lambda: on_move_click("look_around"), outputs=[sequence_display, status_display, btn_undo])
-        btn_happy.click(fn=lambda: on_move_click("happy"), outputs=[sequence_display, status_display, btn_undo])
-        btn_excited.click(fn=lambda: on_move_click("excited"), outputs=[sequence_display, status_display, btn_undo])
+        # Primary move button clicks (using SDK move names)
+        btn_nod.click(fn=lambda: on_move_click("simple_nod"), outputs=[sequence_display, status_display, btn_undo])
+        btn_shake.click(fn=lambda: on_move_click("yeah_nod"), outputs=[sequence_display, status_display, btn_undo])
+        btn_wave.click(fn=lambda: on_move_click("uh_huh_tilt"), outputs=[sequence_display, status_display, btn_undo])
+        btn_look.click(fn=lambda: on_move_click("side_glance_flick"), outputs=[sequence_display, status_display, btn_undo])
+        btn_happy.click(fn=lambda: on_move_click("groovy_sway_and_roll"), outputs=[sequence_display, status_display, btn_undo])
+        btn_excited.click(fn=lambda: on_move_click("side_to_side_sway"), outputs=[sequence_display, status_display, btn_undo])
         
         # Additional primary move button clicks
-        btn_spin.click(fn=lambda: on_move_click("spin"), outputs=[sequence_display, status_display, btn_undo])
-        btn_bow.click(fn=lambda: on_move_click("bow"), outputs=[sequence_display, status_display, btn_undo])
-        btn_shrug.click(fn=lambda: on_move_click("shrug"), outputs=[sequence_display, status_display, btn_undo])
-        btn_think.click(fn=lambda: on_move_click("think"), outputs=[sequence_display, status_display, btn_undo])
-        btn_celebrate.click(fn=lambda: on_move_click("celebrate"), outputs=[sequence_display, status_display, btn_undo])
-        btn_sleep.click(fn=lambda: on_move_click("sleep"), outputs=[sequence_display, status_display, btn_undo])
-        btn_dance.click(fn=lambda: on_move_click("dance"), outputs=[sequence_display, status_display, btn_undo])
-        btn_robot.click(fn=lambda: on_move_click("robot"), outputs=[sequence_display, status_display, btn_undo])
-        btn_star.click(fn=lambda: on_move_click("star"), outputs=[sequence_display, status_display, btn_undo])
-        btn_heart.click(fn=lambda: on_move_click("heart"), outputs=[sequence_display, status_display, btn_undo])
-        btn_cool.click(fn=lambda: on_move_click("cool"), outputs=[sequence_display, status_display, btn_undo])
-        btn_surprise.click(fn=lambda: on_move_click("surprise"), outputs=[sequence_display, status_display, btn_undo])
+        btn_spin.click(fn=lambda: on_move_click("dizzy_spin"), outputs=[sequence_display, status_display, btn_undo])
+        btn_bow.click(fn=lambda: on_move_click("chicken_peck"), outputs=[sequence_display, status_display, btn_undo])
+        btn_shrug.click(fn=lambda: on_move_click("sharp_side_tilt"), outputs=[sequence_display, status_display, btn_undo])
+        btn_think.click(fn=lambda: on_move_click("head_tilt_roll"), outputs=[sequence_display, status_display, btn_undo])
+        btn_celebrate.click(fn=lambda: on_move_click("pendulum_swing"), outputs=[sequence_display, status_display, btn_undo])
+        btn_sleep.click(fn=lambda: on_move_click("neck_recoil"), outputs=[sequence_display, status_display, btn_undo])
+        btn_dance.click(fn=lambda: on_move_click("jackson_square"), outputs=[sequence_display, status_display, btn_undo])
+        btn_robot.click(fn=lambda: on_move_click("grid_snap"), outputs=[sequence_display, status_display, btn_undo])
+        btn_star.click(fn=lambda: on_move_click("chin_lead"), outputs=[sequence_display, status_display, btn_undo])
+        btn_heart.click(fn=lambda: on_move_click("side_peekaboo"), outputs=[sequence_display, status_display, btn_undo])
+        btn_cool.click(fn=lambda: on_move_click("headbanger_combo"), outputs=[sequence_display, status_display, btn_undo])
+        btn_surprise.click(fn=lambda: on_move_click("stumble_and_recover"), outputs=[sequence_display, status_display, btn_undo])
         
         # Control buttons (all in sequence panel)
         btn_play_panel.click(fn=on_play_click, outputs=[sequence_display, status_display, btn_play_panel, btn_undo, btn_clear_panel, btn_stop])
@@ -1392,42 +1352,50 @@ if __name__ == "__main__":
     if SDK_AVAILABLE:
         print("Reachy SDK available - checking for daemon...")
         
-        # Check if daemon is running
+        # Check if daemon is running and spawn if necessary
         import subprocess
-        daemon_running = False
-        try:
-            result = subprocess.run(
-                ["systemctl", "is-active", "reachy_mini_daemon"],
-                capture_output=True,
-                text=True,
-                timeout=2
-            )
-            daemon_running = (result.returncode == 0 and result.stdout.strip() == "active")
-        except Exception as e:
-            print(f"Could not check daemon status: {e}")
+        import psutil
+        import time
         
-        if not daemon_running:
-            print("⚠️  Reachy daemon not running - attempting to start...")
+        def is_daemon_running() -> tuple[bool, int | None]:
+            """Check if reachy-mini-daemon is running."""
+            for proc in psutil.process_iter(["pid", "name", "cmdline"]):
+                try:
+                    cmdline = proc.info.get("cmdline") or []
+                    for cmd in cmdline:
+                        if "reachy-mini-daemon" in cmd:
+                            return True, proc.pid
+                except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+                    continue
+            return False, None
+        
+        daemon_running, pid = is_daemon_running()
+        
+        if daemon_running:
+            print(f"✅ Daemon is already running (PID: {pid})")
+        else:
+            print("⚠️  Reachy daemon not running - starting daemon...")
             try:
-                # Try to start the daemon
-                start_result = subprocess.run(
-                    ["sudo", "systemctl", "start", "reachy_mini_daemon"],
-                    capture_output=True,
-                    text=True,
-                    timeout=5
+                # Spawn the daemon as a background process
+                subprocess.Popen(
+                    ["reachy-mini-daemon"],
+                    start_new_session=True,
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL
                 )
-                if start_result.returncode == 0:
-                    print("✅ Daemon started successfully")
-                    # Wait a moment for daemon to initialize
-                    import time
-                    time.sleep(2)
-                    daemon_running = True
+                print("🚀 Daemon started - waiting for initialization...")
+                time.sleep(3)  # Give daemon time to initialize
+                
+                # Verify daemon started successfully
+                daemon_running, pid = is_daemon_running()
+                if daemon_running:
+                    print(f"✅ Daemon running successfully (PID: {pid})")
                 else:
-                    print(f"⚠️  Could not start daemon: {start_result.stderr}")
+                    print("⚠️  Daemon failed to start - continuing in DEMO mode")
             except Exception as e:
                 print(f"⚠️  Failed to start daemon: {e}")
-        else:
-            print("✅ Daemon is running")
+                print("Running in DEMO mode")
+                daemon_running = False
         
         if daemon_running:
             print("Attempting connection to robot...")
