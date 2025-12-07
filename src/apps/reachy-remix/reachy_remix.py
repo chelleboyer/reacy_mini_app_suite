@@ -304,22 +304,23 @@ button {{
 
 .move-btn {{
     background: linear-gradient(135deg, {theme_config["primary"]} 0%, {theme_config["info"]} 100%) !important;
-    border: 2px solid {theme_config["primary"]}cc !important;
-    border-radius: 8px !important;
-    padding: 12px 20px !important;
-    font-size: 1rem !important;
+    border: 3px solid {theme_config["primary"]}cc !important;
+    border-radius: 15px !important;
+    padding: 20px !important;
+    font-size: 1.2rem !important;
     font-weight: 600 !important;
     color: white !important;
     transition: all 0.2s ease !important;
-    min-height: 50px !important;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15) !important;
+    min-height: 80px !important;
+    min-width: 80px !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
 }}
 
 .move-btn:hover {{
     background: linear-gradient(135deg, {theme_config["info"]} 0%, {theme_config["success"]} 100%) !important;
     border-color: {theme_config["success"]} !important;
-    transform: translateY(-2px) !important;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2) !important;
+    transform: translateY(-3px) scale(1.05) !important;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25) !important;
 }}
 
 .move-btn:active {{
@@ -406,8 +407,8 @@ button {{
 /* Grid Layout - Compact */
 .btn-grid {{
     display: grid !important;
-    grid-template-columns: repeat(3, 1fr) !important;
-    gap: 10px !important;
+    grid-template-columns: repeat(6, 1fr) !important;
+    gap: 8px !important;
     margin: 15px 0 !important;
 }}
 
@@ -498,6 +499,7 @@ class MotionEngine:
         self.robot = robot
         self.controller = controller
         self.demo_mode = (robot is None)
+        self.should_stop = False  # Flag for stopping playback
         
         # Move registry - maps move IDs to execution functions
         self.MOVE_REGISTRY = {
@@ -507,6 +509,19 @@ class MotionEngine:
             "happy": self._move_happy,
             "excited": self._move_excited,
             "look_around": self._move_look_around,
+            # Small moves (basic implementations)
+            "spin": self._move_spin,
+            "bow": self._move_bow,
+            "shrug": self._move_shrug,
+            "think": self._move_think,
+            "celebrate": self._move_celebrate,
+            "sleep": self._move_sleep,
+            "dance": self._move_dance,
+            "robot": self._move_robot,
+            "star": self._move_star,
+            "heart": self._move_heart,
+            "cool": self._move_cool,
+            "surprise": self._move_surprise,
         }
     
     def _move_nod_yes(self):
@@ -556,6 +571,108 @@ class MotionEngine:
             time.sleep(2.0)
         else:
             self.controller.look_around(self.robot, speed=1.0)
+    
+    # Extended library moves (small moves)
+    def _move_spin(self):
+        """Execute spin gesture."""
+        if self.demo_mode:
+            print("  [DEMO] 🌀 Spin")
+            time.sleep(1.5)
+        else:
+            self.controller.nod_yes(self.robot, count=3, speed=2.0)  # Placeholder
+    
+    def _move_bow(self):
+        """Execute bow gesture."""
+        if self.demo_mode:
+            print("  [DEMO] 🙇 Bow")
+            time.sleep(1.5)
+        else:
+            self.controller.nod_yes(self.robot, count=1, speed=0.8)
+    
+    def _move_shrug(self):
+        """Execute shrug gesture."""
+        if self.demo_mode:
+            print("  [DEMO] 🤷 Shrug")
+            time.sleep(1.5)
+        else:
+            self.controller.wave_antennas(self.robot, count=1, synchronized=False)
+    
+    def _move_think(self):
+        """Execute thinking gesture."""
+        if self.demo_mode:
+            print("  [DEMO] 🤔 Think")
+            time.sleep(1.5)
+        else:
+            self.controller.look_around(self.robot, speed=0.5)
+    
+    def _move_celebrate(self):
+        """Execute celebration gesture."""
+        if self.demo_mode:
+            print("  [DEMO] 🙌 Celebrate")
+            time.sleep(1.5)
+        else:
+            self.controller.express_excited(self.robot)
+    
+    def _move_sleep(self):
+        """Execute sleep gesture."""
+        if self.demo_mode:
+            print("  [DEMO] 😴 Sleep")
+            time.sleep(2.0)
+        else:
+            self.controller.nod_yes(self.robot, count=1, speed=0.5)
+    
+    def _move_dance(self):
+        """Execute dance gesture."""
+        if self.demo_mode:
+            print("  [DEMO] 💃 Dance")
+            time.sleep(1.5)
+        else:
+            self.controller.wave_antennas(self.robot, count=2, synchronized=True)
+    
+    def _move_robot(self):
+        """Execute robot pose."""
+        if self.demo_mode:
+            print("  [DEMO] 🤖 Robot Pose")
+            time.sleep(1.5)
+        else:
+            self.controller.express_happy(self.robot)
+    
+    def _move_star(self):
+        """Execute star pose."""
+        if self.demo_mode:
+            print("  [DEMO] ⭐ Star Pose")
+            time.sleep(1.5)
+        else:
+            self.controller.express_excited(self.robot)
+    
+    def _move_heart(self):
+        """Execute love gesture."""
+        if self.demo_mode:
+            print("  [DEMO] ❤️ Love")
+            time.sleep(1.5)
+        else:
+            self.controller.express_happy(self.robot)
+    
+    def _move_cool(self):
+        """Execute cool gesture."""
+        if self.demo_mode:
+            print("  [DEMO] 😎 Cool")
+            time.sleep(1.5)
+        else:
+            self.controller.express_happy(self.robot)
+    
+    def _move_surprise(self):
+        """Execute surprise gesture."""
+        if self.demo_mode:
+            print("  [DEMO] 😲 Surprise")
+            time.sleep(1.5)
+        else:
+            self.controller.express_excited(self.robot)
+    
+    def stop_playback(self):
+        """Request to stop current playback."""
+        self.should_stop = True
+        print("[STOP] Stop signal sent to motion engine")
     
     def execute_move(self, move_id: str) -> bool:
         """Execute a single move.
@@ -618,10 +735,21 @@ class MotionEngine:
             Tuple[int, ExecutionResult]: (current_index, result_so_far)
         """
         moves_completed = 0
+        self.should_stop = False  # Reset stop flag
         print(f"\n▶️  Executing sequence: {len(sequence)} moves")
         
         try:
             for i, move_id in enumerate(sequence):
+                # Check for stop signal
+                if self.should_stop:
+                    print(f"  [STOP] Playback stopped at move {i+1}/{len(sequence)}")
+                    yield i, ExecutionResult(
+                        success=False,
+                        moves_completed=moves_completed,
+                        error_message="Playback stopped by user"
+                    )
+                    return
+                
                 print(f"  [{i+1}/{len(sequence)}] {move_id}")
                 
                 # Yield BEFORE execution (index i)
@@ -680,6 +808,7 @@ class PlayState(Enum):
     """Playback state machine states."""
     IDLE = "idle"
     PLAYING = "playing"
+    STOPPED = "stopped"
     ERROR = "error"
 
 
@@ -699,21 +828,36 @@ class AppState:
         """Check if sequence can be played.
         
         Returns:
-            True if in IDLE state and sequence is not empty
+            True if in IDLE or STOPPED state and sequence is not empty
         """
-        return self.current_state == PlayState.IDLE and len(self.sequence) > 0
+        return self.current_state in [PlayState.IDLE, PlayState.STOPPED] and len(self.sequence) > 0
+    
+    def can_stop(self) -> bool:
+        """Check if playback can be stopped.
+        
+        Returns:
+            True if currently in PLAYING state
+        """
+        return self.current_state == PlayState.PLAYING
     
     def start_playing(self) -> None:
-        """Transition from IDLE to PLAYING state."""
-        if self.current_state == PlayState.IDLE:
+        """Transition from IDLE/STOPPED to PLAYING state."""
+        if self.current_state in [PlayState.IDLE, PlayState.STOPPED]:
             self.current_state = PlayState.PLAYING
             self.error_message = None
         else:
             raise ValueError(f"Cannot start playing from {self.current_state}")
     
-    def finish_playing(self) -> None:
-        """Transition from PLAYING to IDLE state."""
+    def stop_playing(self) -> None:
+        """Transition from PLAYING to STOPPED state."""
         if self.current_state == PlayState.PLAYING:
+            self.current_state = PlayState.STOPPED
+        else:
+            raise ValueError(f"Cannot stop from {self.current_state}")
+    
+    def finish_playing(self) -> None:
+        """Transition from PLAYING/STOPPED to IDLE state."""
+        if self.current_state in [PlayState.PLAYING, PlayState.STOPPED]:
             self.current_state = PlayState.IDLE
         else:
             raise ValueError(f"Cannot finish playing from {self.current_state}")
@@ -739,15 +883,33 @@ class SequenceBuilder:
     Manages the move sequence and converts to emoji display format.
     """
     
+    # Move definitions with size categories (per Robot Dance Studio PRD)
+    MOVE_DEFINITIONS = [
+        # Large primary moves (main grid)
+        {"id": "nod_yes", "label": "Nod Yes", "emoji": "👍", "size": "large", "category": "gesture"},
+        {"id": "shake_no", "label": "Shake No", "emoji": "👎", "size": "large", "category": "gesture"},
+        {"id": "wave", "label": "Wave", "emoji": "👋", "size": "large", "category": "gesture"},
+        {"id": "look_around", "label": "Look Around", "emoji": "👀", "size": "large", "category": "gesture"},
+        {"id": "happy", "label": "Happy", "emoji": "😊", "size": "large", "category": "emotion"},
+        {"id": "excited", "label": "Excited", "emoji": "🎉", "size": "large", "category": "emotion"},
+        
+        # Small secondary moves (extended library)
+        {"id": "spin", "label": "Spin", "emoji": "🌀", "size": "small", "category": "dance"},
+        {"id": "bow", "label": "Bow", "emoji": "🙇", "size": "small", "category": "gesture"},
+        {"id": "shrug", "label": "Shrug", "emoji": "🤷", "size": "small", "category": "gesture"},
+        {"id": "think", "label": "Think", "emoji": "🤔", "size": "small", "category": "emotion"},
+        {"id": "celebrate", "label": "Celebrate", "emoji": "🙌", "size": "small", "category": "emotion"},
+        {"id": "sleep", "label": "Sleep", "emoji": "😴", "size": "small", "category": "emotion"},
+        {"id": "dance", "label": "Dance", "emoji": "💃", "size": "small", "category": "dance"},
+        {"id": "robot", "label": "Robot Pose", "emoji": "🤖", "size": "small", "category": "dance"},
+        {"id": "star", "label": "Star Pose", "emoji": "⭐", "size": "small", "category": "dance"},
+        {"id": "heart", "label": "Love", "emoji": "❤️", "size": "small", "category": "emotion"},
+        {"id": "cool", "label": "Cool", "emoji": "😎", "size": "small", "category": "emotion"},
+        {"id": "surprise", "label": "Surprise", "emoji": "😲", "size": "small", "category": "emotion"},
+    ]
+    
     # Emoji mapping for moves
-    EMOJI_MAP = {
-        "nod_yes": "👍",
-        "shake_no": "👎",
-        "wave": "👋",
-        "happy": "😊",
-        "excited": "🎉",
-        "look_around": "👀",
-    }
+    EMOJI_MAP = {move["id"]: move["emoji"] for move in MOVE_DEFINITIONS}
     
     # Empty state message
     EMPTY_MESSAGE = "Tap moves above to build your dance! 🎵"
@@ -921,12 +1083,14 @@ def create_app():
         """Handle move button click - adds move to sequence."""
         display = sequence_builder.add_move(move_id)
         app_state.sequence = sequence_builder.get_sequence()
-        move_names = {"nod_yes": "Nod Yes", "shake_no": "Shake No", "wave": "Wave", "look_around": "Look Around", "happy": "Happy", "excited": "Excited"}
-        move_name = move_names.get(move_id, move_id)
+        # Get move definition from MOVE_DEFINITIONS
+        move_def = next((m for m in sequence_builder.MOVE_DEFINITIONS if m["id"] == move_id), None)
+        move_name = move_def["label"] if move_def else move_id
+        move_emoji = move_def["emoji"] if move_def else "❓"
         print(f"[DEBUG] Added move: {move_id}")
         print(f"[DEBUG] Total moves: {len(sequence_builder.moves)}")
         # AC5.3: Enable undo button when moves exist
-        status_html = f'<div class="alert alert-success">✅ <strong>{move_name}</strong> added! ({len(sequence_builder.moves)} moves)</div>'
+        status_html = f'<div class="alert alert-success">{move_emoji} <strong>{move_name}</strong> added! ({len(sequence_builder.moves)} moves)</div>'
         return (
             gr.update(value=display),
             gr.update(value=status_html),
@@ -973,7 +1137,8 @@ def create_app():
                 status_html,
                 gr.update(value="▶️ Play Sequence", interactive=True),
                 gr.update(interactive=False), # undo
-                gr.update(interactive=True)   # clear
+                gr.update(interactive=True),  # clear
+                gr.update(interactive=False)  # stop
             )
             return
         
@@ -983,14 +1148,15 @@ def create_app():
             app_state.start_playing()
             print(f"[PLAYBACK] Starting sequence of {len(app_state.sequence)} moves")
             
-            # Disable play button during playback
+            # Disable play button during playback, enable stop button
             status_html = '<div class="alert alert-info">🎵 <strong>Starting...</strong> Get ready! 🕺</div>'
             yield (
                 sequence_builder.format_sequence(-1),
                 status_html,
                 gr.update(value="🎬 Playing...", interactive=False),
                 gr.update(interactive=False), # undo disabled
-                gr.update(interactive=False)  # clear disabled
+                gr.update(interactive=False), # clear disabled
+                gr.update(interactive=True)   # stop enabled
             )
             
             # Execute full sequence with generator
@@ -1010,7 +1176,8 @@ def create_app():
                         status_html,
                         gr.update(value="🎬 Playing...", interactive=False),
                         gr.update(interactive=False),
-                        gr.update(interactive=False)
+                        gr.update(interactive=False),
+                        gr.update(interactive=True)
                     )
             
             # AC4.3: Status messages based on result
@@ -1034,14 +1201,41 @@ def create_app():
                 # Reset from error to allow retry
                 app_state.reset()
         
-        # AC5.3: Return play button to normal state
+        # AC5.3: Return play button to normal state, disable stop
         yield (
             sequence_builder.format_sequence(-1),
             status,
             gr.update(value="▶️ Play Sequence", interactive=True),
             gr.update(interactive=True), # undo enabled
-            gr.update(interactive=True)  # clear enabled
+            gr.update(interactive=True), # clear enabled
+            gr.update(interactive=False) # stop disabled
         )
+    
+    def on_stop_click():
+        """Handle stop button click - stops current playback."""
+        if app_state.can_stop():
+            motion_engine.stop_playback()
+            app_state.stop_playing()
+            status_html = '<div class="alert alert-warning">⏹️ <strong>Stopped!</strong> Playback interrupted.</div>'
+            print("[DEBUG] Stop clicked")
+            return (
+                sequence_builder.format_sequence(-1),
+                status_html,
+                gr.update(value="▶️ Play Sequence", interactive=True),
+                gr.update(interactive=True),  # undo
+                gr.update(interactive=True),  # clear
+                gr.update(interactive=False)  # stop disabled
+            )
+        else:
+            # Not playing, do nothing
+            return (
+                gr.update(),
+                gr.update(),
+                gr.update(),
+                gr.update(),
+                gr.update(),
+                gr.update()
+            )
     
     def on_theme_change(theme_name):
         """Handle theme change - updates CSS dynamically."""
@@ -1063,10 +1257,27 @@ def create_app():
         # Inject custom CSS
         css_element = gr.HTML(f"<style id='custom-theme-style'>{custom_css}</style>")
         
-        # Compact Header
+        # Compact Header with App Mode Selector
         with gr.Row(elem_classes=["compact-header"]):
-            with gr.Column(scale=3):
-                gr.HTML('<h2>🎵 Reachy Remix - Dance Builder</h2>')
+            with gr.Column(scale=2):
+                gr.HTML('<h2>🤖 Robot Dance Studio</h2>')
+                gr.HTML('<p style="font-size: 0.9em; margin: 0; opacity: 0.9;">Build amazing dance sequences!</p>')
+            with gr.Column(scale=1):
+                gr.HTML('<p style="font-size: 0.8em; margin: 5px 0; font-weight: bold;">🎮 App Mode:</p>')
+                gr.HTML('''
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <button style="background: #4CAF50; color: white; border: 2px solid white; 
+                                       padding: 8px 12px; border-radius: 8px; font-size: 0.85em; font-weight: bold;
+                                       box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                            🎵 Reachy Remix
+                        </button>
+                        <button style="background: #999; color: white; border: 2px solid #666; 
+                                       padding: 8px 12px; border-radius: 8px; font-size: 0.85em;
+                                       opacity: 0.6; cursor: not-allowed;" title="Coming soon">
+                            📻 Reachy Radio
+                        </button>
+                    </div>
+                ''')
             with gr.Column(scale=1):
                 theme_selector = gr.Dropdown(
                     choices=list(TTKBOOTSTRAP_THEMES.keys()),
@@ -1082,34 +1293,50 @@ def create_app():
         # Main container
         with gr.Column(elem_classes=["compact-container"]):
             
-            # Sequence Display
-            gr.HTML('<div class="section-title">📋 Your Sequence</div>')
-            sequence_display = gr.HTML(
-                '<div id="sequence-card" style="text-align: center; padding: 25px; font-size: 1.2em;">Tap moves below to build your dance! 🎵</div>'
-            )
+            # Sequence Display with all controls on the right side
+            gr.HTML('<div class="section-title">📋 Dance Sequence</div>')
+            with gr.Row():
+                with gr.Column(scale=3):
+                    sequence_display = gr.HTML(
+                        '<div id="sequence-card" style="text-align: center; padding: 25px; font-size: 1.2em;">Tap moves below to build your dance! 🎵</div>'
+                    )
+                with gr.Column(scale=1):
+                    btn_play_panel = gr.Button(value="▶️ PLAY", elem_classes=["btn-success"], variant="primary", size="lg")
+                    btn_stop = gr.Button(value="⏹️ STOP", elem_classes=["btn-danger"], interactive=False, size="lg")
+                    btn_clear_panel = gr.Button(value="🗑️ CLEAR", elem_classes=["btn-danger"], size="lg")
+                    btn_undo = gr.Button(value="↩️ Undo", elem_classes=["btn-warning"], interactive=False)
             
             # Status (positioned right below sequence)
             status_display = gr.HTML(
                 '<div class="alert alert-success">✅ <strong>Ready!</strong> Select moves to start.</div>'
             )
             
-            # Move Buttons
-            gr.HTML('<div class="section-title">🎨 Moves</div>')
+            # Primary Move Buttons (Large) - 6 wide x 3 high
+            gr.HTML('<div class="section-title">🎨 Primary Moves</div>')
             with gr.Row(elem_classes=["btn-grid"]):
-                btn_nod = gr.Button(value="👍 Nod Yes", elem_classes=["move-btn"])
-                btn_shake = gr.Button(value="👎 Shake No", elem_classes=["move-btn"])
-                btn_wave = gr.Button(value="👋 Wave", elem_classes=["move-btn"])
+                btn_nod = gr.Button(value="👍 Nod Yes", elem_classes=["move-btn"], size="lg")
+                btn_shake = gr.Button(value="👎 Shake No", elem_classes=["move-btn"], size="lg")
+                btn_wave = gr.Button(value="👋 Wave", elem_classes=["move-btn"], size="lg")
+                btn_look = gr.Button(value="👀 Look", elem_classes=["move-btn"], size="lg")
+                btn_happy = gr.Button(value="😊 Happy", elem_classes=["move-btn"], size="lg")
+                btn_excited = gr.Button(value="🎉 Excited", elem_classes=["move-btn"], size="lg")
             with gr.Row(elem_classes=["btn-grid"]):
-                btn_look = gr.Button(value="👀 Look", elem_classes=["move-btn"])
-                btn_happy = gr.Button(value="😊 Happy", elem_classes=["move-btn"])
-                btn_excited = gr.Button(value="🎉 Excited", elem_classes=["move-btn"])
+                btn_spin = gr.Button(value="🌀 Spin", elem_classes=["move-btn"], size="lg")
+                btn_bow = gr.Button(value="🙇 Bow", elem_classes=["move-btn"], size="lg")
+                btn_shrug = gr.Button(value="🤷 Shrug", elem_classes=["move-btn"], size="lg")
+                btn_think = gr.Button(value="🤔 Think", elem_classes=["move-btn"], size="lg")
+                btn_celebrate = gr.Button(value="🙌 Celebrate", elem_classes=["move-btn"], size="lg")
+                btn_sleep = gr.Button(value="😴 Sleep", elem_classes=["move-btn"], size="lg")
+            with gr.Row(elem_classes=["btn-grid"]):
+                btn_dance = gr.Button(value="💃 Dance", elem_classes=["move-btn"], size="lg")
+                btn_robot = gr.Button(value="🤖 Robot", elem_classes=["move-btn"], size="lg")
+                btn_star = gr.Button(value="⭐ Star", elem_classes=["move-btn"], size="lg")
+                btn_heart = gr.Button(value="❤️ Love", elem_classes=["move-btn"], size="lg")
+                btn_cool = gr.Button(value="😎 Cool", elem_classes=["move-btn"], size="lg")
+                btn_surprise = gr.Button(value="😲 Surprise", elem_classes=["move-btn"], size="lg")
             
-            # Controls
-            gr.HTML('<div class="section-title">🎮 Controls</div>')
-            with gr.Row(elem_classes=["control-grid"]):
-                btn_undo = gr.Button(value="↩️ Undo", elem_classes=["btn-warning"], interactive=False)
-                btn_play = gr.Button(value="▶️ Play Sequence", elem_classes=["btn-success"], variant="primary")
-                btn_clear = gr.Button(value="🗑️ Clear", elem_classes=["btn-danger"])
+
+
         
         # ========================================
         # EVENT HANDLERS
@@ -1118,7 +1345,7 @@ def create_app():
         # Theme selector - updates CSS instantly
         theme_selector.change(fn=on_theme_change, inputs=[theme_selector], outputs=[css_element, theme_info])
         
-        # Move button clicks
+        # Primary move button clicks
         btn_nod.click(fn=lambda: on_move_click("nod_yes"), outputs=[sequence_display, status_display, btn_undo])
         btn_shake.click(fn=lambda: on_move_click("shake_no"), outputs=[sequence_display, status_display, btn_undo])
         btn_wave.click(fn=lambda: on_move_click("wave"), outputs=[sequence_display, status_display, btn_undo])
@@ -1126,10 +1353,25 @@ def create_app():
         btn_happy.click(fn=lambda: on_move_click("happy"), outputs=[sequence_display, status_display, btn_undo])
         btn_excited.click(fn=lambda: on_move_click("excited"), outputs=[sequence_display, status_display, btn_undo])
         
-        # Control button clicks
-        btn_play.click(fn=on_play_click, outputs=[sequence_display, status_display, btn_play, btn_undo, btn_clear])
+        # Additional primary move button clicks
+        btn_spin.click(fn=lambda: on_move_click("spin"), outputs=[sequence_display, status_display, btn_undo])
+        btn_bow.click(fn=lambda: on_move_click("bow"), outputs=[sequence_display, status_display, btn_undo])
+        btn_shrug.click(fn=lambda: on_move_click("shrug"), outputs=[sequence_display, status_display, btn_undo])
+        btn_think.click(fn=lambda: on_move_click("think"), outputs=[sequence_display, status_display, btn_undo])
+        btn_celebrate.click(fn=lambda: on_move_click("celebrate"), outputs=[sequence_display, status_display, btn_undo])
+        btn_sleep.click(fn=lambda: on_move_click("sleep"), outputs=[sequence_display, status_display, btn_undo])
+        btn_dance.click(fn=lambda: on_move_click("dance"), outputs=[sequence_display, status_display, btn_undo])
+        btn_robot.click(fn=lambda: on_move_click("robot"), outputs=[sequence_display, status_display, btn_undo])
+        btn_star.click(fn=lambda: on_move_click("star"), outputs=[sequence_display, status_display, btn_undo])
+        btn_heart.click(fn=lambda: on_move_click("heart"), outputs=[sequence_display, status_display, btn_undo])
+        btn_cool.click(fn=lambda: on_move_click("cool"), outputs=[sequence_display, status_display, btn_undo])
+        btn_surprise.click(fn=lambda: on_move_click("surprise"), outputs=[sequence_display, status_display, btn_undo])
+        
+        # Control buttons (all in sequence panel)
+        btn_play_panel.click(fn=on_play_click, outputs=[sequence_display, status_display, btn_play_panel, btn_undo, btn_clear_panel, btn_stop])
+        btn_clear_panel.click(fn=on_clear_click, outputs=[sequence_display, status_display, btn_undo])
         btn_undo.click(fn=on_undo_click, outputs=[sequence_display, status_display, btn_undo])
-        btn_clear.click(fn=on_clear_click, outputs=[sequence_display, status_display, btn_undo])
+        btn_stop.click(fn=on_stop_click, outputs=[sequence_display, status_display, btn_play_panel, btn_undo, btn_clear_panel, btn_stop])
     
     return app
 
