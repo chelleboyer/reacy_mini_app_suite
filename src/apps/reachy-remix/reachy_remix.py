@@ -40,196 +40,381 @@ except ImportError:
 
 
 # ============================================================
-# THEME & STYLING
+# THEME & STYLING - TTKBootstrap Inspired
 # ============================================================
 
-# Custom Gradio theme - playful and kid-friendly
-theme = gr.themes.Soft(
-    primary_hue="violet",
-    secondary_hue="orange",
-    font=gr.themes.GoogleFont("Fredoka"),
-    radius_size=gr.themes.sizes.radius_lg,
-)
-
-# Custom CSS for animations and enhanced styling (Story 5)
-custom_css = """
-/* Story 5: Animations */
-
-/* AC5.1: Move button hover effects */
-.move-button {
-    min-width: 80px !important;
-    min-height: 80px !important;
-    font-size: 2em !important;
-    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
-    cursor: pointer;
-}
-
-.move-button:hover {
-    transform: scale(1.05) !important;
-    box-shadow: 0 6px 16px rgba(102, 126, 234, 0.5) !important;
-}
-
-.move-button:active {
-    transform: scale(0.98) !important;
-}
-
-/* AC5.2: Sequence display animations */
-.sequence-display {
-    background: linear-gradient(135deg, #667eea22 0%, #764ba222 100%) !important;
-    padding: 25px !important;
-    border-radius: 15px !important;
-    text-align: center !important;
-    min-height: 120px !important;
-    font-size: 3em !important;
-    transition: all 0.3s ease !important;
-}
-
-.sequence-display h1 {
-    font-size: 2.5em !important;
-    line-height: 1.2 !important;
-    margin: 10px 0 !important;
-}
-
-/* Bounce animation for new emojis */
-@keyframes bounceIn {
-    0% { 
-        transform: scale(0.3);
-        opacity: 0;
+# TTKBootstrap-inspired theme definitions
+TTKBOOTSTRAP_THEMES = {
+    "cosmo": {
+        "name": "Cosmo",
+        "type": "light",
+        "primary": "#2780E3",
+        "secondary": "#373A3C",
+        "success": "#3FB618",
+        "info": "#9954BB",
+        "warning": "#FF7518",
+        "danger": "#FF0039",
+        "bg": "#FFFFFF",
+        "fg": "#373A3C",
+    },
+    "flatly": {
+        "name": "Flatly",
+        "type": "light",
+        "primary": "#2C3E50",
+        "secondary": "#95A5A6",
+        "success": "#18BC9C",
+        "info": "#3498DB",
+        "warning": "#F39C12",
+        "danger": "#E74C3C",
+        "bg": "#FFFFFF",
+        "fg": "#2C3E50",
+    },
+    "minty": {
+        "name": "Minty",
+        "type": "light",
+        "primary": "#78C2AD",
+        "secondary": "#F3969A",
+        "success": "#56CC9D",
+        "info": "#6CC3D5",
+        "warning": "#FFCE67",
+        "danger": "#FF7851",
+        "bg": "#FFFFFF",
+        "fg": "#5A5A5A",
+    },
+    "pulse": {
+        "name": "Pulse",
+        "type": "light",
+        "primary": "#593196",
+        "secondary": "#A991D4",
+        "success": "#13B955",
+        "info": "#009CDC",
+        "warning": "#EBA31D",
+        "danger": "#FC3939",
+        "bg": "#FFFFFF",
+        "fg": "#444444",
+    },
+    "solar": {
+        "name": "Solar",
+        "type": "dark",
+        "primary": "#B58900",
+        "secondary": "#2AA198",
+        "success": "#859900",
+        "info": "#268BD2",
+        "warning": "#CB4B16",
+        "danger": "#DC322F",
+        "bg": "#002B36",
+        "fg": "#839496",
+    },
+    "darkly": {
+        "name": "Darkly",
+        "type": "dark",
+        "primary": "#375A7F",
+        "secondary": "#444444",
+        "success": "#00BC8C",
+        "info": "#3498DB",
+        "warning": "#F39C12",
+        "danger": "#E74C3C",
+        "bg": "#222222",
+        "fg": "#AAAAAA",
+    },
+    "cyborg": {
+        "name": "Cyborg",
+        "type": "dark",
+        "primary": "#2A9FD6",
+        "secondary": "#555555",
+        "success": "#77B300",
+        "info": "#9933CC",
+        "warning": "#FF8800",
+        "danger": "#CC0000",
+        "bg": "#060606",
+        "fg": "#ADAFAE",
+    },
+    "superhero": {
+        "name": "Superhero",
+        "type": "dark",
+        "primary": "#DF691A",
+        "secondary": "#5BC0DE",
+        "success": "#5CB85C",
+        "info": "#5BC0DE",
+        "warning": "#F0AD4E",
+        "danger": "#D9534F",
+        "bg": "#2B3E50",
+        "fg": "#EBEBEB",
+    },
+    "vapor": {
+        "name": "Vapor",
+        "type": "dark",
+        "primary": "#EA00D9",
+        "secondary": "#0ABDC6",
+        "success": "#711C91",
+        "info": "#0ABDC6",
+        "warning": "#EA00D9",
+        "danger": "#F50057",
+        "bg": "#1A1A2E",
+        "fg": "#E5E5E5",
     }
-    50% { 
-        transform: scale(1.1);
-    }
-    100% { 
-        transform: scale(1);
-        opacity: 1;
-    }
 }
 
-.sequence-display span {
-    display: inline-block;
-    animation: bounceIn 0.4s ease;
-    margin: 0 4px;
-}
+# Current active theme (default to minty)
+current_theme_name = "minty"
 
-/* Wiggle animation when playing */
-@keyframes wiggle {
-    0%, 100% { transform: rotate(0deg); }
-    25% { transform: rotate(-1deg); }
-    50% { transform: rotate(0deg); }
-    75% { transform: rotate(1deg); }
-}
+def create_theme(theme_name="minty"):
+    """Create a Gradio theme based on TTKBootstrap themes."""
+    theme_config = TTKBOOTSTRAP_THEMES.get(theme_name, TTKBOOTSTRAP_THEMES["minty"])
+    
+    # Base theme selection
+    if theme_config["type"] == "dark":
+        base_theme = gr.themes.Soft(
+            primary_hue=gr.themes.colors.slate,
+            secondary_hue=gr.themes.colors.slate,
+            neutral_hue=gr.themes.colors.slate,
+            font=gr.themes.GoogleFont("Fredoka One"),
+            radius_size=gr.themes.sizes.radius_lg,
+        )
+    else:
+        base_theme = gr.themes.Soft(
+            primary_hue=gr.themes.colors.slate,
+            secondary_hue=gr.themes.colors.orange,
+            neutral_hue=gr.themes.colors.slate,
+            font=gr.themes.GoogleFont("Fredoka One"),
+            radius_size=gr.themes.sizes.radius_lg,
+        )
+    
+    # Apply theme colors
+    theme = base_theme.set(
+        body_background_fill=theme_config["bg"],
+        block_background_fill=theme_config["bg"] if theme_config["type"] == "dark" else "#FFFFFF",
+        block_border_width="3px",
+        block_border_color=theme_config["secondary"],
+        block_shadow=f"4px 4px 0px {theme_config['secondary']}",
+        button_primary_background_fill=theme_config["primary"],
+        button_primary_background_fill_hover=theme_config["info"],
+        button_primary_border_color=theme_config["secondary"],
+        button_primary_text_color="#FFFFFF" if theme_config["type"] == "dark" else theme_config["fg"],
+        button_secondary_background_fill=theme_config["warning"],
+        button_secondary_border_color=theme_config["secondary"],
+        button_secondary_text_color=theme_config["fg"],
+    )
+    
+    return theme
 
-.sequence-playing {
-    animation: wiggle 0.5s ease 2;
-}
+# Initialize default theme
+theme = create_theme(current_theme_name)
 
-/* AC5.1: Control buttons with hover */
-.control-button {
-    min-width: 100px !important;
-    min-height: 60px !important;
-    font-size: 1.3em !important;
-    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease !important;
-}
+def get_custom_css(theme_name="minty"):
+    """Generate custom CSS based on selected theme - Compact TTKBootstrap style."""
+    theme_config = TTKBOOTSTRAP_THEMES.get(theme_name, TTKBOOTSTRAP_THEMES["minty"])
+    is_dark = theme_config["type"] == "dark"
+    
+    # Card background for dark themes
+    card_bg = f"rgba(255, 255, 255, 0.05)" if is_dark else "#FFFFFF"
+    text_color = theme_config["fg"]
+    bg_secondary = f"{theme_config['bg']}ee" if is_dark else "#f8f9fa"
+    
+    return f"""
+@import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap');
 
-.control-button:hover:not(:disabled) {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-}
+/* TTKBootstrap Compact Design with Emoji Support */
+* {{
+    font-family: 'Segoe UI', 'Noto Color Emoji', -apple-system, BlinkMacSystemFont, sans-serif !important;
+}}
 
-.control-button:active:not(:disabled) {
-    transform: translateY(0px) !important;
-}
+.gradio-container {{
+    background: {theme_config["bg"]} !important;
+    color: {text_color} !important;
+    padding: 0 !important;
+}}
 
-/* AC5.3: Button state visual feedback */
-.btn-playing {
-    background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%) !important;
+/* Compact Header */
+.compact-header {{
+    background: {theme_config["primary"]} !important;
+    padding: 15px 25px !important;
+    border-bottom: 2px solid {theme_config["info"]} !important;
+}}
+
+.compact-header h2 {{
+    margin: 0 !important;
+    font-size: 1.8em !important;
+    font-weight: 700 !important;
     color: white !important;
-    animation: pulse 1.5s ease-in-out infinite;
-}
+}}
 
-@keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.8; }
-}
+/* Compact Container */
+.compact-container {{
+    max-width: 1200px !important;
+    margin: 0 auto !important;
+    padding: 15px !important;
+}}
 
-.btn-disabled, button:disabled {
-    opacity: 0.4 !important;
-    cursor: not-allowed !important;
-    filter: grayscale(0.5);
-}
+/* Sequence Display - Compact */
+#sequence-card {{
+    background: {card_bg} !important;
+    border: 1px solid {theme_config["primary"]}60 !important;
+    border-radius: 6px !important;
+    padding: 20px !important;
+    margin: 15px 0 !important;
+    min-height: 100px !important;
+}}
 
-/* AC5.4: Status message styling with color coding */
-.status-message {
-    font-size: 1.1em;
-    padding: 15px;
-    border-radius: 10px;
-    text-align: center;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
+/* Move Buttons - Compact with clear emojis */
+button {{
+    font-family: 'Segoe UI', 'Noto Color Emoji', sans-serif !important;
+}}
 
-.status-ready {
-    background-color: rgba(59, 130, 246, 0.15);
-    border-left: 4px solid rgba(59, 130, 246, 0.6);
-}
+.move-btn {{
+    background: {theme_config["primary"]} !important;
+    border: 1px solid {theme_config["primary"]} !important;
+    border-radius: 5px !important;
+    padding: 12px 20px !important;
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    color: white !important;
+    transition: all 0.15s ease !important;
+    min-height: 50px !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12) !important;
+}}
 
-.status-success {
-    background-color: rgba(34, 197, 94, 0.15);
-    border-left: 4px solid rgba(34, 197, 94, 0.6);
-    animation: successPop 0.4s ease;
-}
+.move-btn:hover {{
+    background: {theme_config["info"]} !important;
+    border-color: {theme_config["info"]} !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
+}}
 
-@keyframes successPop {
-    0% { transform: scale(0.95); }
-    50% { transform: scale(1.02); }
-    100% { transform: scale(1); }
-}
+.move-btn:active {{
+    transform: translateY(0) !important;
+}}
 
-.status-error {
-    background-color: rgba(239, 68, 68, 0.15);
-    border-left: 4px solid rgba(239, 68, 68, 0.6);
-}
+/* Control Buttons - Bootstrap size */
+.btn-success {{
+    background: {theme_config["success"]} !important;
+    border: 1px solid {theme_config["success"]} !important;
+    color: white !important;
+}}
 
-.status-playing {
-    background-color: rgba(168, 85, 247, 0.15);
-    border-left: 4px solid rgba(168, 85, 247, 0.6);
-    animation: pulse 1.5s ease-in-out infinite;
-}
+.btn-success:hover {{
+    background: {theme_config["info"]} !important;
+    border-color: {theme_config["info"]} !important;
+}}
 
-/* Header styling */
-.app-header {
-    text-align: center;
-    margin-bottom: 20px;
-}
+.btn-warning {{
+    background: {theme_config["warning"]} !important;
+    border: 1px solid {theme_config["warning"]} !important;
+    color: white !important;
+}}
 
-/* AC5.5: Responsive layout */
-@media (max-width: 768px) {
-    .move-button {
-        min-width: 70px !important;
-        min-height: 70px !important;
-        font-size: 1.8em !important;
-    }
-    
-    .control-button {
-        min-width: 90px !important;
-        min-height: 55px !important;
-        font-size: 1.2em !important;
-    }
-    
-    .sequence-display {
-        font-size: 1.3em;
-        padding: 20px;
-    }
-}
+.btn-warning:hover {{
+    background: {theme_config["primary"]} !important;
+}}
 
-/* Smooth transitions for all interactive elements */
-* {
-    -webkit-tap-highlight-color: transparent;
-}
+.btn-danger {{
+    background: {theme_config["danger"]} !important;
+    border: 1px solid {theme_config["danger"]} !important;
+    color: white !important;
+}}
 
-button {
-    touch-action: manipulation;
-}
+.btn-danger:hover {{
+    background: {theme_config["secondary"]} !important;
+}}
+
+/* Status Alert - Bootstrap compact */
+.alert {{
+    padding: 10px 15px !important;
+    margin: 10px 0 !important;
+    border-radius: 4px !important;
+    border-left: 3px solid !important;
+    font-size: 0.95rem !important;
+}}
+
+.alert-success {{
+    background: {theme_config["success"]}20 !important;
+    border-left-color: {theme_config["success"]} !important;
+    color: {text_color} !important;
+}}
+
+.alert-info {{
+    background: {theme_config["info"]}20 !important;
+    border-left-color: {theme_config["info"]} !important;
+    color: {text_color} !important;
+}}
+
+.alert-warning {{
+    background: {theme_config["warning"]}20 !important;
+    border-left-color: {theme_config["warning"]} !important;
+    color: {text_color} !important;
+}}
+
+.alert-danger {{
+    background: {theme_config["danger"]}20 !important;
+    border-left-color: {theme_config["danger"]} !important;
+    color: {text_color} !important;
+}}
+
+/* Grid Layout - Compact */
+.btn-grid {{
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 10px !important;
+    margin: 15px 0 !important;
+}}
+
+.control-grid {{
+    display: grid !important;
+    grid-template-columns: 1fr 2fr 1fr !important;
+    gap: 10px !important;
+    margin: 15px 0 !important;
+}}
+
+/* Section titles */
+.section-title {{
+    font-size: 1.1rem !important;
+    font-weight: 600 !important;
+    color: {text_color} !important;
+    margin: 20px 0 10px 0 !important;
+    padding-left: 10px !important;
+    border-left: 3px solid {theme_config["primary"]} !important;
+}}
+
+/* Force emoji rendering */
+button, div, span, p, h1, h2, h3 {{
+    font-family: 'Segoe UI', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji', sans-serif !important;
+    text-rendering: optimizeLegibility !important;
+    -webkit-font-smoothing: antialiased !important;
+}}
+
+/* Ensure button text shows emojis */
+button span {{
+    font-size: 1.1em !important;
+    line-height: 1.5 !important;
+}}
+
+/* Emoji size in buttons */
+.move-btn span, .btn-success span, .btn-warning span, .btn-danger span {{
+    display: inline-block !important;
+    vertical-align: middle !important;
+}}
+
+/* Gradio overrides for compact layout */
+.gradio-container .main {{
+    padding: 0 !important;
+}}
+
+.gradio-container .contain {{
+    max-width: 100% !important;
+}}
+
+/* Override Gradio's button text truncation */
+.gradio-container button {{
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+}}
 """
+
+# Initialize default CSS
+custom_css = get_custom_css(current_theme_name)
+
 
 
 # ============================================================
@@ -264,86 +449,61 @@ class MotionEngine:
         
         # Move registry - maps move IDs to execution functions
         self.MOVE_REGISTRY = {
+            "nod_yes": self._move_nod_yes,
+            "shake_no": self._move_shake_no,
             "wave": self._move_wave,
-            "robot_pose": self._move_robot_pose,
-            "spin": self._move_spin,
-            "stretch": self._move_stretch,
-            "dab": self._move_dab,
-            "pause": self._move_pause,
+            "happy": self._move_happy,
+            "excited": self._move_excited,
+            "look_around": self._move_look_around,
         }
     
+    def _move_nod_yes(self):
+        """Execute nod yes gesture."""
+        if self.demo_mode:
+            print("  [DEMO] 👍 Nod Yes")
+            time.sleep(1.5)
+        else:
+            self.controller.nod_yes(self.robot, count=2, speed=1.5)
+    
+    def _move_shake_no(self):
+        """Execute shake no gesture."""
+        if self.demo_mode:
+            print("  [DEMO] 👎 Shake No")
+            time.sleep(1.5)
+        else:
+            self.controller.shake_no(self.robot, count=2, speed=1.5)
+    
     def _move_wave(self):
-        """Execute wave gesture."""
+        """Execute wave antennas gesture."""
         if self.demo_mode:
             print("  [DEMO] 👋 Wave")
-            time.sleep(1.0)
+            time.sleep(2.0)
         else:
-            self.controller.wave_antennas(self.robot, count=2, speed=1.0)
+            self.controller.wave_antennas(self.robot, count=2, synchronized=True)
     
-    def _move_robot_pose(self):
-        """Execute neutral robot pose."""
+    def _move_happy(self):
+        """Execute happy expression."""
         if self.demo_mode:
-            print("  [DEMO] 🤖 Robot Pose")
-            time.sleep(1.0)
-        else:
-            self.controller.transition_to_pose(
-                self.robot, 
-                roll=0, pitch=0, yaw=0,
-                left_antenna=0, right_antenna=0,
-                duration=1.0, 
-                degrees=True
-            )
-    
-    def _move_spin(self):
-        """Execute spin motion (head rotation sequence)."""
-        if self.demo_mode:
-            print("  [DEMO] 💃 Spin")
+            print("  [DEMO] 😊 Happy")
             time.sleep(1.5)
         else:
-            # Look left
-            self.robot.move_head(yaw=-30, duration=0.5, degrees=True)
-            time.sleep(0.5)
-            # Look right
-            self.robot.move_head(yaw=30, duration=0.5, degrees=True)
-            time.sleep(0.5)
-            # Center
-            self.robot.move_head(yaw=0, duration=0.5, degrees=True)
-            time.sleep(0.5)
+            self.controller.express_happy(self.robot)
     
-    def _move_stretch(self):
-        """Execute stretch motion (pitch + antenna extension)."""
+    def _move_excited(self):
+        """Execute excited expression."""
         if self.demo_mode:
-            print("  [DEMO] 🙆 Stretch")
+            print("  [DEMO] 🎉 Excited")
             time.sleep(1.5)
         else:
-            self.controller.transition_to_pose(
-                self.robot,
-                pitch=-15,
-                left_antenna=0.8,
-                right_antenna=-0.8,
-                duration=1.5,
-                degrees=True
-            )
+            self.controller.express_excited(self.robot)
     
-    def _move_dab(self):
-        """Execute dab motion (roll + pitch + yaw combo)."""
+    def _move_look_around(self):
+        """Execute look around gesture."""
         if self.demo_mode:
-            print("  [DEMO] 🕺 Dab")
-            time.sleep(1.0)
+            print("  [DEMO] 👀 Look Around")
+            time.sleep(2.0)
         else:
-            self.controller.transition_to_pose(
-                self.robot,
-                roll=20, pitch=-10, yaw=15,
-                left_antenna=-0.5, right_antenna=0.8,
-                duration=0.8,
-                degrees=True
-            )
-    
-    def _move_pause(self):
-        """Execute pause (no motion, just delay)."""
-        if self.demo_mode:
-            print("  [DEMO] ⏸ Pause")
-        time.sleep(0.5)
+            self.controller.look_around(self.robot, speed=1.0)
     
     def execute_move(self, move_id: str) -> bool:
         """Execute a single move.
@@ -389,30 +549,50 @@ class MotionEngine:
         Returns:
             ExecutionResult with success status and details
         """
-        moves_completed = 0
+        # Delegate to generator but consume all
+        result = None
+        for _, res in self.execute_sequence_generator(sequence, with_feedback):
+            result = res
+        return result
+
+    def execute_sequence_generator(self, sequence: List[str], with_feedback: bool = True):
+        """Execute a full sequence of moves, yielding progress.
         
+        Args:
+            sequence: List of move IDs to execute in order
+            with_feedback: Whether to provide micro-feedback between moves
+            
+        Yields:
+            Tuple[int, ExecutionResult]: (current_index, result_so_far)
+        """
+        moves_completed = 0
         print(f"\n▶️  Executing sequence: {len(sequence)} moves")
         
         try:
             for i, move_id in enumerate(sequence):
                 print(f"  [{i+1}/{len(sequence)}] {move_id}")
                 
+                # Yield BEFORE execution (index i)
+                yield i, ExecutionResult(success=True, moves_completed=moves_completed)
+                
                 # Execute move (catching exceptions to provide detailed error messages)
                 try:
                     success = self.execute_move(move_id)
                     if not success:
-                        return ExecutionResult(
+                        yield i, ExecutionResult(
                             success=False,
                             moves_completed=moves_completed,
                             error_message=f"Move '{move_id}' failed"
                         )
+                        return
                 except Exception as move_error:
                     # Capture underlying error details
-                    return ExecutionResult(
+                    yield i, ExecutionResult(
                         success=False,
                         moves_completed=moves_completed,
                         error_message=str(move_error)
                     )
+                    return
                 
                 moves_completed += 1
                 
@@ -424,7 +604,8 @@ class MotionEngine:
                 time.sleep(0.5)
             
             print(f"✅ Sequence complete: {moves_completed} moves\n")
-            return ExecutionResult(
+            # Yield completion (index -1 or len)
+            yield -1, ExecutionResult(
                 success=True,
                 moves_completed=moves_completed
             )
@@ -432,7 +613,7 @@ class MotionEngine:
         except Exception as e:
             error_msg = f"Sequence execution error: {str(e)}"
             print(f"[ERROR] {error_msg}")
-            return ExecutionResult(
+            yield moves_completed, ExecutionResult(
                 success=False,
                 moves_completed=moves_completed,
                 error_message=error_msg
@@ -508,12 +689,12 @@ class SequenceBuilder:
     
     # Emoji mapping for moves
     EMOJI_MAP = {
+        "nod_yes": "👍",
+        "shake_no": "👎",
         "wave": "👋",
-        "robot_pose": "🤖",
-        "spin": "💃",
-        "stretch": "🙆",
-        "dab": "🕺",
-        "pause": "⏸",
+        "happy": "😊",
+        "excited": "🎉",
+        "look_around": "👀",
     }
     
     # Empty state message
@@ -522,6 +703,7 @@ class SequenceBuilder:
     def __init__(self):
         """Initialize sequence builder."""
         self.moves: List[str] = []
+        self._version = 0  # Version counter to force Gradio updates
     
     def add_move(self, move_id: str) -> str:
         """Add a move to the sequence.
@@ -533,6 +715,7 @@ class SequenceBuilder:
             Formatted sequence display string
         """
         self.moves.append(move_id)
+        self._version += 1  # Increment to force Gradio refresh
         return self.format_sequence()
     
     def undo_last(self) -> str:
@@ -543,6 +726,7 @@ class SequenceBuilder:
         """
         if self.moves:
             self.moves.pop()
+        self._version += 1  # Increment to force Gradio refresh
         return self.format_sequence()
     
     def clear_all(self) -> str:
@@ -552,21 +736,113 @@ class SequenceBuilder:
             Empty state message
         """
         self.moves.clear()
+        self._version += 1  # Increment to force Gradio refresh
         return self.format_sequence()
     
-    def format_sequence(self) -> str:
-        """Format sequence as emoji display.
+    def format_sequence(self, current_index: int = -1) -> str:
+        """Format sequence with compact, attractive display.
+        
+        Args:
+            current_index: Index of currently playing move (-1 for none)
         
         Returns:
-            Formatted string with emojis or empty message
+            Formatted HTML with smart highlighting
         """
         if not self.moves:
-            return self.EMPTY_MESSAGE
+            return f'''
+            <div style="text-align: center; padding: 40px; font-size: 1.3em; color: #888; 
+                        background: #FFFFFF;
+                        border-radius: 20px; border: 3px dashed #000000;">
+                🎶 {self.EMPTY_MESSAGE}
+            </div>
+            '''
         
-        # Create emoji string with spacing
+        # Map for display names
+        move_names = {
+            "nod_yes": "Nod Yes",
+            "shake_no": "Shake No",
+            "wave": "Wave",
+            "look_around": "Look Around",
+            "happy": "Happy",
+            "excited": "Excited"
+        }
+        
+        # Create compact emoji row with smart sizing
         emojis = [self.EMOJI_MAP.get(move, "❓") for move in self.moves]
-        emoji_string = "  ".join(emojis)  # Double space for better visibility
-        return f"**Your Dance:**\n\n# {emoji_string}"
+        emoji_parts = []
+        
+        for i, emoji in enumerate(emojis):
+            is_current = (i == current_index)
+            is_past = (current_index >= 0 and i < current_index)
+            
+            # Size and style based on state
+            if is_current:
+                # Currently playing - BIG and glowing
+                style = '''font-size: 3.5em; margin: 0 8px; display: inline-block;
+                          animation: bounce-glow 0.6s ease-in-out infinite;
+                          filter: drop-shadow(0 0 5px #32CD32);
+                          transform: translateY(-5px);'''
+            elif is_past:
+                # Already played - small and faded
+                style = 'font-size: 2em; margin: 0 6px; display: inline-block; opacity: 0.3;'
+            else:
+                # Waiting or idle - normal size
+                style = f'font-size: 2.5em; margin: 0 8px; display: inline-block; opacity: {0.5 if current_index >= 0 else 1.0};'
+            
+            emoji_parts.append(f'<span style="{style}">{emoji}</span>')
+        
+        emoji_html = ''.join(emoji_parts)
+        
+        # Progress bar (visual indicator)
+        progress_bar = ""
+        if current_index >= 0:
+            progress_pct = ((current_index + 1) / len(self.moves)) * 100
+            current_move_name = move_names.get(self.moves[current_index], self.moves[current_index])
+            progress_bar = f'''
+            <div style="margin: 15px 0;">
+                <div style="background: #EEE; border-radius: 10px; height: 12px; overflow: hidden; border: 2px solid #000;">
+                    <div style="background: #32CD32; 
+                                height: 100%; width: {progress_pct}%; 
+                                transition: width 0.3s ease;"></div>
+                </div>
+                <p style="font-size: 1.1em; font-weight: bold; color: #000; margin-top: 8px;">
+                    ▶️ Now Playing: {current_move_name} ({current_index + 1}/{len(self.moves)})
+                </p>
+            </div>
+            '''
+        
+        # Compact header
+        header = f'''
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <span style="font-size: 1.2em; font-weight: bold; color: #000;">🎵 Your Dance</span>
+            <span style="background: #FFD700; padding: 6px 12px; border-radius: 20px; border: 2px solid #000;
+                         font-size: 0.9em; font-weight: bold; color: #000;">{len(self.moves)} moves</span>
+        </div>
+        '''
+        
+        # Return compact, beautiful design
+        return f'''
+        <div style="padding: 25px; 
+                    background: #FFFFFF; 
+                    border-radius: 18px; 
+                    border: 3px solid #000000;
+                    box-shadow: 6px 6px 0px #000000;">
+            {header}
+            {progress_bar}
+            <div style="overflow-x: auto; white-space: nowrap; padding: 15px 5px; 
+                        background: #F0F8FF; border-radius: 12px; border: 2px solid #000;
+                        scrollbar-width: thin; scrollbar-color: #000 transparent;">
+                {emoji_html}
+            </div>
+        </div>
+        <style>
+        @keyframes bounce-glow {{
+            0%, 100% {{ transform: translateY(-5px); filter: drop-shadow(0 0 5px #32CD32); }}
+            50% {{ transform: translateY(-10px); filter: drop-shadow(0 0 10px #32CD32); }}
+        }}
+        </style>
+        <!-- v{self._version} -->
+        '''
     
     def get_sequence(self) -> List[str]:
         """Get current move sequence.
@@ -593,11 +869,15 @@ def create_app():
         """Handle move button click - adds move to sequence."""
         display = sequence_builder.add_move(move_id)
         app_state.sequence = sequence_builder.get_sequence()
-        print(f"[DEBUG] Added move: {move_id}, Display: {display[:50]}...")  # Debug output
+        move_names = {"nod_yes": "Nod Yes", "shake_no": "Shake No", "wave": "Wave", "look_around": "Look Around", "happy": "Happy", "excited": "Excited"}
+        move_name = move_names.get(move_id, move_id)
+        print(f"[DEBUG] Added move: {move_id}")
+        print(f"[DEBUG] Total moves: {len(sequence_builder.moves)}")
         # AC5.3: Enable undo button when moves exist
+        status_html = f'<div class="alert alert-success">&#9989; <strong>{move_name}</strong> added! ({len(sequence_builder.moves)} moves)</div>'
         return (
-            display,
-            "Ready! 🎉",
+            gr.update(value=display),
+            gr.update(value=status_html),
             gr.update(interactive=True)  # Undo button enabled
         )
     
@@ -605,11 +885,15 @@ def create_app():
         """Handle undo button click - removes last move."""
         display = sequence_builder.undo_last()
         app_state.sequence = sequence_builder.get_sequence()
-        status = "Ready! 🎉" if sequence_builder.moves else "Add some moves to get started! 🎵"
+        if sequence_builder.moves:
+            status_html = f'<div class="alert alert-info">&#8617;&#65039; Undone! ({len(sequence_builder.moves)} moves left)</div>'
+        else:
+            status_html = '<div class="alert alert-warning">&#8505;&#65039; Sequence empty - add moves! &#127925;</div>'
+        print(f"[DEBUG] Undo clicked, remaining moves: {len(sequence_builder.moves)}")
         # AC5.3: Return button states (undo disabled when empty)
         return (
-            display,
-            status,
+            gr.update(value=display),
+            gr.update(value=status_html),
             gr.update(interactive=len(sequence_builder.moves) > 0)  # Undo button state
         )
     
@@ -618,45 +902,76 @@ def create_app():
         display = sequence_builder.clear_all()
         app_state.sequence = sequence_builder.get_sequence()
         app_state.reset()  # Reset any error state
+        print(f"[DEBUG] Clear clicked")
+        status_html = '<div class="alert alert-warning">&#128465;&#65039; <strong>Cleared!</strong> Ready for new sequence.</div>'
         # AC5.3: Disable undo button after clear
         return (
-            display,
-            "Cleared! Ready for a new dance! 🧹",
+            gr.update(value=display),
+            gr.update(value=status_html),
             gr.update(interactive=False)  # Undo button disabled
         )
     
     def on_play_click():
-        """Handle play button click - executes sequence (Story 4 + Story 5 enhancements)."""
+        """Handle play button click - executes sequence."""
         # AC4.1: Check if can play
         if not app_state.can_play():
-            return (
+            status_html = '<div class="alert alert-warning">&#9888;&#65039; Add at least one move first!</div>'
+            yield (
                 sequence_builder.format_sequence(),
-                "Add at least one move first! 🙂",
-                gr.update(value="▶️ Play", interactive=True, elem_classes=["control-button"])
+                status_html,
+                gr.update(value="▶️ Play Sequence", interactive=True),
+                gr.update(interactive=False), # undo
+                gr.update(interactive=True)   # clear
             )
+            return
         
-        # AC5.3: Change button during execution (visual feedback)
+        status = "Ready! 🎉"
         try:
             # AC4.2: Start playing
             app_state.start_playing()
+            print(f"[PLAYBACK] Starting sequence of {len(app_state.sequence)} moves")
             
-            # Update status to show playing
-            display = sequence_builder.format_sequence()
-            status = "Playing your dance... 🎵"
+            # Disable play button during playback
+            status_html = '<div class="alert alert-info">&#127925; <strong>Starting...</strong> Get ready! &#128378;</div>'
+            yield (
+                sequence_builder.format_sequence(-1),
+                status_html,
+                gr.update(value="🎬 Playing...", interactive=False),
+                gr.update(interactive=False), # undo disabled
+                gr.update(interactive=False)  # clear disabled
+            )
             
-            # AC4.2: Execute sequence via motion engine
-            result = motion_engine.execute_sequence(app_state.sequence, with_feedback=True)
+            # Execute full sequence with generator
+            result = None
+            for current_index, partial_result in motion_engine.execute_sequence_generator(app_state.sequence, with_feedback=True):
+                result = partial_result
+                
+                if not result.success:
+                    break
+                
+                # Update UI for current move
+                if current_index >= 0 and current_index < len(app_state.sequence):
+                    progress_pct = int(((current_index + 1) / len(app_state.sequence)) * 100)
+                    status_html = f'<div class="alert alert-info">&#128131; <strong>Move {current_index + 1}/{len(app_state.sequence)}</strong> ({progress_pct}%)</div>'
+                    yield (
+                        sequence_builder.format_sequence(current_index),
+                        status_html,
+                        gr.update(value="🎬 Playing...", interactive=False),
+                        gr.update(interactive=False),
+                        gr.update(interactive=False)
+                    )
             
             # AC4.3: Status messages based on result
-            if result.success:
-                status = "Sequence complete! 🎉"
+            if result and result.success:
+                status = '<div class="alert alert-success">&#127881; <strong>Success!</strong> Awesome dance!</div>'
             else:
-                status = f"⚠️ {result.error_message}"
-                app_state.set_error(result.error_message)
+                error_msg = result.error_message if result else "Unknown error"
+                status = f'<div class="alert alert-danger">&#9888;&#65039; <strong>Error:</strong> {error_msg}</div>'
+                app_state.set_error(error_msg)
             
         except Exception as e:
             # AC4.5: Error recovery
-            status = f"⚠️ Something went wrong: {str(e)}"
+            status = f'<div class="alert alert-danger">&#10060; <strong>Error:</strong> {str(e)}</div>'
             app_state.set_error(str(e))
         
         finally:
@@ -668,162 +983,101 @@ def create_app():
                 app_state.reset()
         
         # AC5.3: Return play button to normal state
-        return (
-            display,
+        yield (
+            sequence_builder.format_sequence(-1),
             status,
-            gr.update(value="▶️ Play", interactive=True, elem_classes=["control-button"])
+            gr.update(value="▶️ Play Sequence", interactive=True),
+            gr.update(interactive=True), # undo enabled
+            gr.update(interactive=True)  # clear enabled
         )
+    
+    def on_theme_change(theme_name):
+        """Handle theme change - requires app reload."""
+        global current_theme_name, theme, custom_css
+        current_theme_name = theme_name
+        theme = create_theme(theme_name)
+        custom_css = get_custom_css(theme_name)
+        
+        theme_display = TTKBOOTSTRAP_THEMES[theme_name]["name"]
+        return gr.update(value=f"""
+        <div style="padding: 15px; background: {TTKBOOTSTRAP_THEMES[theme_name]['primary']}; 
+                    border-radius: 10px; color: white; text-align: center;">
+            <strong>🎨 Theme changed to {theme_display}!</strong><br/>
+            <span style="font-size: 0.9em;">Refresh the page to see the new theme applied.</span>
+        </div>
+        """)
     
     with gr.Blocks(title="🎵 Reachy Remix") as app:
         
-        # Header
-        gr.Markdown(
-            """
-            # 🎵 Reachy Remix - Motion Builder
-            
-            **Build your dance sequence, then watch Reachy perform it!**
-            """,
-            elem_classes=["app-header"]
-        )
+        # Inject custom CSS
+        gr.HTML(f"<style>{custom_css}</style>")
         
-        with gr.Row():
-            # ========================================
-            # LEFT COLUMN: Move Palette
-            # ========================================
+        # Compact Header
+        with gr.Row(elem_classes=["compact-header"]):
+            with gr.Column(scale=3):
+                gr.HTML('<h2>&#127925; Reachy Remix - Dance Builder</h2>')
             with gr.Column(scale=1):
-                gr.Markdown("## 🎨 Moves")
-                gr.Markdown("*Tap to add to your sequence*")
-                
-                btn_wave = gr.Button(
-                    "👋 Wave",
-                    elem_classes=["move-button"],
-                    variant="secondary"
+                theme_selector = gr.Dropdown(
+                    choices=list(TTKBOOTSTRAP_THEMES.keys()),
+                    value=current_theme_name,
+                    label="&#127912; Theme",
+                    interactive=True
                 )
-                
-                btn_robot = gr.Button(
-                    "🤖 Robot Pose",
-                    elem_classes=["move-button"],
-                    variant="secondary"
+                theme_info = gr.HTML(
+                    f'<div style="font-size: 0.85em; opacity: 0.8; padding: 5px;">Current: <strong>{TTKBOOTSTRAP_THEMES[current_theme_name]["name"]}</strong></div>'
                 )
-                
-                btn_spin = gr.Button(
-                    "💃 Spin",
-                    elem_classes=["move-button"],
-                    variant="secondary"
-                )
-                
-                btn_stretch = gr.Button(
-                    "🙆 Stretch",
-                    elem_classes=["move-button"],
-                    variant="secondary"
-                )
-                
-                btn_dab = gr.Button(
-                    "🕺 Dab",
-                    elem_classes=["move-button"],
-                    variant="secondary"
-                )
-                
-                btn_pause = gr.Button(
-                    "⏸ Pause",
-                    elem_classes=["move-button"],
-                    variant="secondary"
-                )
+        
+        # Main container
+        with gr.Column(elem_classes=["compact-container"]):
             
-            # ========================================
-            # CENTER COLUMN: Sequence Display
-            # ========================================
-            with gr.Column(scale=2):
-                gr.Markdown("## 🎬 Your Creation")
-                
-                sequence_display = gr.Markdown(
-                    "Tap moves above to build your dance! 🎵",
-                    elem_classes=["sequence-display"]
-                )
-                
-                gr.Markdown("*Your dance sequence will appear here*")
+            # Sequence Display
+            gr.HTML('<div class="section-title">&#128203; Your Sequence</div>')
+            sequence_display = gr.HTML(
+                '<div id="sequence-card" style="text-align: center; padding: 25px; font-size: 1.2em;">Tap moves below to build your dance! &#127925;</div>'
+            )
             
-            # ========================================
-            # RIGHT COLUMN: Controls
-            # ========================================
-            with gr.Column(scale=1):
-                gr.Markdown("## 🎮 Controls")
-                
-                btn_play = gr.Button(
-                    "▶️ Play",
-                    elem_classes=["control-button"],
-                    variant="primary"
-                )
-                
-                btn_undo = gr.Button(
-                    "↩️ Undo",
-                    elem_classes=["control-button"],
-                    interactive=False  # AC5.3: Initially disabled (no moves yet)
-                )
-                
-                btn_clear = gr.Button(
-                    "🧹 Clear",
-                    elem_classes=["control-button"]
-                )
+            # Move Buttons
+            gr.HTML('<div class="section-title">&#127912; Moves</div>')
+            with gr.Row(elem_classes=["btn-grid"]):
+                btn_nod = gr.Button(value="&#128077; Nod Yes", elem_classes=["move-btn"])
+                btn_shake = gr.Button(value="&#128078; Shake No", elem_classes=["move-btn"])
+                btn_wave = gr.Button(value="&#128075; Wave", elem_classes=["move-btn"])
+            with gr.Row(elem_classes=["btn-grid"]):
+                btn_look = gr.Button(value="&#128064; Look", elem_classes=["move-btn"])
+                btn_happy = gr.Button(value="&#128522; Happy", elem_classes=["move-btn"])
+                btn_excited = gr.Button(value="&#127881; Excited", elem_classes=["move-btn"])
+            
+            # Controls
+            gr.HTML('<div class="section-title">&#127918; Controls</div>')
+            with gr.Row(elem_classes=["control-grid"]):
+                btn_undo = gr.Button(value="&#8617;&#65039; Undo", elem_classes=["btn-warning"], interactive=False)
+                btn_play = gr.Button(value="&#9654;&#65039; Play Sequence", elem_classes=["btn-success"], variant="primary")
+                btn_clear = gr.Button(value="&#128465;&#65039; Clear", elem_classes=["btn-danger"])
+            
+            # Status
+            status_display = gr.HTML(
+                '<div class="alert alert-success">&#9989; <strong>Ready!</strong> Select moves to start.</div>'
+            )
         
         # ========================================
-        # STATUS BAR (Bottom)
-        # ========================================
-        status_display = gr.Markdown(
-            "Ready! 🎉",
-            elem_classes=["status-message", "status-ready"]
-        )
-        
-        # ========================================
-        # EVENT HANDLERS (Story 3 - State Management)
+        # EVENT HANDLERS
         # ========================================
         
-        # Move button clicks - add moves to sequence (Story 5: enable undo)
-        btn_wave.click(
-            fn=lambda: on_move_click("wave"),
-            outputs=[sequence_display, status_display, btn_undo]
-        )
+        # Theme selector
+        theme_selector.change(fn=on_theme_change, inputs=[theme_selector], outputs=[theme_info])
         
-        btn_robot.click(
-            fn=lambda: on_move_click("robot_pose"),
-            outputs=[sequence_display, status_display, btn_undo]
-        )
-        
-        btn_spin.click(
-            fn=lambda: on_move_click("spin"),
-            outputs=[sequence_display, status_display, btn_undo]
-        )
-        
-        btn_stretch.click(
-            fn=lambda: on_move_click("stretch"),
-            outputs=[sequence_display, status_display, btn_undo]
-        )
-        
-        btn_dab.click(
-            fn=lambda: on_move_click("dab"),
-            outputs=[sequence_display, status_display, btn_undo]
-        )
-        
-        btn_pause.click(
-            fn=lambda: on_move_click("pause"),
-            outputs=[sequence_display, status_display, btn_undo]
-        )
+        # Move button clicks
+        btn_nod.click(fn=lambda: on_move_click("nod_yes"), outputs=[sequence_display, status_display, btn_undo])
+        btn_shake.click(fn=lambda: on_move_click("shake_no"), outputs=[sequence_display, status_display, btn_undo])
+        btn_wave.click(fn=lambda: on_move_click("wave"), outputs=[sequence_display, status_display, btn_undo])
+        btn_look.click(fn=lambda: on_move_click("look_around"), outputs=[sequence_display, status_display, btn_undo])
+        btn_happy.click(fn=lambda: on_move_click("happy"), outputs=[sequence_display, status_display, btn_undo])
+        btn_excited.click(fn=lambda: on_move_click("excited"), outputs=[sequence_display, status_display, btn_undo])
         
         # Control button clicks
-        btn_play.click(
-            fn=on_play_click,
-            outputs=[sequence_display, status_display, btn_play]  # AC4.4: Button state control
-        )
-        
-        btn_undo.click(
-            fn=on_undo_click,
-            outputs=[sequence_display, status_display, btn_undo]  # Story 5: Control own state
-        )
-        
-        btn_clear.click(
-            fn=on_clear_click,
-            outputs=[sequence_display, status_display, btn_undo]  # Story 5: Disable undo
-        )
+        btn_play.click(fn=on_play_click, outputs=[sequence_display, status_display, btn_play, btn_undo, btn_clear])
+        btn_undo.click(fn=on_undo_click, outputs=[sequence_display, status_display, btn_undo])
+        btn_clear.click(fn=on_clear_click, outputs=[sequence_display, status_display, btn_undo])
     
     return app
 
@@ -872,15 +1126,12 @@ if __name__ == "__main__":
     # Optional: Test sequence execution
     if motion_engine.demo_mode:
         print("\n🧪 Demo Test: Executing sample sequence...")
-        test_sequence = ["wave", "spin", "dab"]
+        test_sequence = ["nod_yes", "wave", "happy"]
         result = motion_engine.execute_sequence(test_sequence, with_feedback=False)
         print(f"Test result: {'✅ Success' if result.success else '❌ Failed'}")
         print()
     
     app = create_app()
-    
-    # Apply theme after creation (Gradio 6.0 pattern)
-    app.theme = theme
     
     # Launch Gradio app
     app.launch(
