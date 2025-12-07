@@ -874,7 +874,7 @@ def create_app():
         print(f"[DEBUG] Added move: {move_id}")
         print(f"[DEBUG] Total moves: {len(sequence_builder.moves)}")
         # AC5.3: Enable undo button when moves exist
-        status_html = f'<div class="alert alert-success">&#9989; <strong>{move_name}</strong> added! ({len(sequence_builder.moves)} moves)</div>'
+        status_html = f'<div class="alert alert-success">✅ <strong>{move_name}</strong> added! ({len(sequence_builder.moves)} moves)</div>'
         return (
             gr.update(value=display),
             gr.update(value=status_html),
@@ -886,9 +886,9 @@ def create_app():
         display = sequence_builder.undo_last()
         app_state.sequence = sequence_builder.get_sequence()
         if sequence_builder.moves:
-            status_html = f'<div class="alert alert-info">&#8617;&#65039; Undone! ({len(sequence_builder.moves)} moves left)</div>'
+            status_html = f'<div class="alert alert-info">↩️ Undone! ({len(sequence_builder.moves)} moves left)</div>'
         else:
-            status_html = '<div class="alert alert-warning">&#8505;&#65039; Sequence empty - add moves! &#127925;</div>'
+            status_html = '<div class="alert alert-warning">ℹ️ Sequence empty - add moves! 🎵</div>'
         print(f"[DEBUG] Undo clicked, remaining moves: {len(sequence_builder.moves)}")
         # AC5.3: Return button states (undo disabled when empty)
         return (
@@ -903,7 +903,7 @@ def create_app():
         app_state.sequence = sequence_builder.get_sequence()
         app_state.reset()  # Reset any error state
         print(f"[DEBUG] Clear clicked")
-        status_html = '<div class="alert alert-warning">&#128465;&#65039; <strong>Cleared!</strong> Ready for new sequence.</div>'
+        status_html = '<div class="alert alert-warning">🗑️ <strong>Cleared!</strong> Ready for new sequence.</div>'
         # AC5.3: Disable undo button after clear
         return (
             gr.update(value=display),
@@ -915,7 +915,7 @@ def create_app():
         """Handle play button click - executes sequence."""
         # AC4.1: Check if can play
         if not app_state.can_play():
-            status_html = '<div class="alert alert-warning">&#9888;&#65039; Add at least one move first!</div>'
+            status_html = '<div class="alert alert-warning">⚠️ Add at least one move first!</div>'
             yield (
                 sequence_builder.format_sequence(),
                 status_html,
@@ -932,7 +932,7 @@ def create_app():
             print(f"[PLAYBACK] Starting sequence of {len(app_state.sequence)} moves")
             
             # Disable play button during playback
-            status_html = '<div class="alert alert-info">&#127925; <strong>Starting...</strong> Get ready! &#128378;</div>'
+            status_html = '<div class="alert alert-info">🎵 <strong>Starting...</strong> Get ready! 🕺</div>'
             yield (
                 sequence_builder.format_sequence(-1),
                 status_html,
@@ -952,7 +952,7 @@ def create_app():
                 # Update UI for current move
                 if current_index >= 0 and current_index < len(app_state.sequence):
                     progress_pct = int(((current_index + 1) / len(app_state.sequence)) * 100)
-                    status_html = f'<div class="alert alert-info">&#128131; <strong>Move {current_index + 1}/{len(app_state.sequence)}</strong> ({progress_pct}%)</div>'
+                    status_html = f'<div class="alert alert-info">💃 <strong>Move {current_index + 1}/{len(app_state.sequence)}</strong> ({progress_pct}%)</div>'
                     yield (
                         sequence_builder.format_sequence(current_index),
                         status_html,
@@ -963,15 +963,15 @@ def create_app():
             
             # AC4.3: Status messages based on result
             if result and result.success:
-                status = '<div class="alert alert-success">&#127881; <strong>Success!</strong> Awesome dance!</div>'
+                status = '<div class="alert alert-success">🎉 <strong>Success!</strong> Awesome dance!</div>'
             else:
                 error_msg = result.error_message if result else "Unknown error"
-                status = f'<div class="alert alert-danger">&#9888;&#65039; <strong>Error:</strong> {error_msg}</div>'
+                status = f'<div class="alert alert-danger">⚠️ <strong>Error:</strong> {error_msg}</div>'
                 app_state.set_error(error_msg)
             
         except Exception as e:
             # AC4.5: Error recovery
-            status = f'<div class="alert alert-danger">&#10060; <strong>Error:</strong> {str(e)}</div>'
+            status = f'<div class="alert alert-danger">❌ <strong>Error:</strong> {str(e)}</div>'
             app_state.set_error(str(e))
         
         finally:
@@ -1015,12 +1015,12 @@ def create_app():
         # Compact Header
         with gr.Row(elem_classes=["compact-header"]):
             with gr.Column(scale=3):
-                gr.HTML('<h2>&#127925; Reachy Remix - Dance Builder</h2>')
+                gr.HTML('<h2>🎵 Reachy Remix - Dance Builder</h2>')
             with gr.Column(scale=1):
                 theme_selector = gr.Dropdown(
                     choices=list(TTKBOOTSTRAP_THEMES.keys()),
                     value=current_theme_name,
-                    label="&#127912; Theme",
+                    label="🎨 Theme",
                     interactive=True
                 )
                 theme_info = gr.HTML(
@@ -1031,32 +1031,32 @@ def create_app():
         with gr.Column(elem_classes=["compact-container"]):
             
             # Sequence Display
-            gr.HTML('<div class="section-title">&#128203; Your Sequence</div>')
+            gr.HTML('<div class="section-title">📋 Your Sequence</div>')
             sequence_display = gr.HTML(
-                '<div id="sequence-card" style="text-align: center; padding: 25px; font-size: 1.2em;">Tap moves below to build your dance! &#127925;</div>'
+                '<div id="sequence-card" style="text-align: center; padding: 25px; font-size: 1.2em;">Tap moves below to build your dance! 🎵</div>'
             )
             
             # Move Buttons
-            gr.HTML('<div class="section-title">&#127912; Moves</div>')
+            gr.HTML('<div class="section-title">🎨 Moves</div>')
             with gr.Row(elem_classes=["btn-grid"]):
-                btn_nod = gr.Button(value="&#128077; Nod Yes", elem_classes=["move-btn"])
-                btn_shake = gr.Button(value="&#128078; Shake No", elem_classes=["move-btn"])
-                btn_wave = gr.Button(value="&#128075; Wave", elem_classes=["move-btn"])
+                btn_nod = gr.Button(value="👍 Nod Yes", elem_classes=["move-btn"])
+                btn_shake = gr.Button(value="👎 Shake No", elem_classes=["move-btn"])
+                btn_wave = gr.Button(value="👋 Wave", elem_classes=["move-btn"])
             with gr.Row(elem_classes=["btn-grid"]):
-                btn_look = gr.Button(value="&#128064; Look", elem_classes=["move-btn"])
-                btn_happy = gr.Button(value="&#128522; Happy", elem_classes=["move-btn"])
-                btn_excited = gr.Button(value="&#127881; Excited", elem_classes=["move-btn"])
+                btn_look = gr.Button(value="👀 Look", elem_classes=["move-btn"])
+                btn_happy = gr.Button(value="😊 Happy", elem_classes=["move-btn"])
+                btn_excited = gr.Button(value="🎉 Excited", elem_classes=["move-btn"])
             
             # Controls
-            gr.HTML('<div class="section-title">&#127918; Controls</div>')
+            gr.HTML('<div class="section-title">🎮 Controls</div>')
             with gr.Row(elem_classes=["control-grid"]):
-                btn_undo = gr.Button(value="&#8617;&#65039; Undo", elem_classes=["btn-warning"], interactive=False)
-                btn_play = gr.Button(value="&#9654;&#65039; Play Sequence", elem_classes=["btn-success"], variant="primary")
-                btn_clear = gr.Button(value="&#128465;&#65039; Clear", elem_classes=["btn-danger"])
+                btn_undo = gr.Button(value="↩️ Undo", elem_classes=["btn-warning"], interactive=False)
+                btn_play = gr.Button(value="▶️ Play Sequence", elem_classes=["btn-success"], variant="primary")
+                btn_clear = gr.Button(value="🗑️ Clear", elem_classes=["btn-danger"])
             
             # Status
             status_display = gr.HTML(
-                '<div class="alert alert-success">&#9989; <strong>Ready!</strong> Select moves to start.</div>'
+                '<div class="alert alert-success">✅ <strong>Ready!</strong> Select moves to start.</div>'
             )
         
         # ========================================
